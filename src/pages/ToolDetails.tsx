@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, ExternalLink, Star, Zap, DollarSign, Check, X } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Star, Zap, DollarSign, Check, X, Loader2 } from "lucide-react";
+import Footer from "@/components/Footer";
 
 export default function ToolDetails() {
   const { id } = useParams();
@@ -227,6 +227,8 @@ export default function ToolDetails() {
           </div>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

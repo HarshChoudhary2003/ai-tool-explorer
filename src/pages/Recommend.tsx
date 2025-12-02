@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Loader2, ExternalLink, TrendingUp, DollarSign } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import Footer from "@/components/Footer";
 
 export default function Recommend() {
   const [task, setTask] = useState("");
@@ -215,6 +216,8 @@ export default function Recommend() {
           )}
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
