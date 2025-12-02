@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, X, ExternalLink, Check, Minus } from "lucide-react";
 import { Link } from "react-router-dom";
+import Footer from "@/components/Footer";
 
 export default function Compare() {
   const [searchParams] = useSearchParams();
@@ -262,6 +263,8 @@ export default function Compare() {
           </Card>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

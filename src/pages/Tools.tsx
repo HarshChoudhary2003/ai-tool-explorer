@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
 import { FilterBar } from "@/components/FilterBar";
+import Footer from "@/components/Footer";
 import { Loader2 } from "lucide-react";
 
 export default function Tools() {
@@ -86,6 +87,8 @@ export default function Tools() {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 }

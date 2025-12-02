@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
+import Footer from "@/components/Footer";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ export default function Index() {
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <Badge className="mb-4 glass border-primary/30 text-primary">
               <Sparkles className="h-4 w-4 mr-2" />
-              30+ AI Tools Curated
+              100+ AI Tools Curated
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold leading-tight">
               Discover the{" "}
@@ -175,6 +176,8 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }
