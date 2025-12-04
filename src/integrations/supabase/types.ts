@@ -118,6 +118,17 @@ export type Database = {
         | "productivity"
         | "code_assistant"
         | "data_analysis"
+        | "writing"
+        | "research"
+        | "customer_support"
+        | "marketing"
+        | "design"
+        | "education"
+        | "sales"
+        | "hr_recruiting"
+        | "legal"
+        | "finance"
+        | "healthcare"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -257,6 +268,17 @@ export const Constants = {
         "productivity",
         "code_assistant",
         "data_analysis",
+        "writing",
+        "research",
+        "customer_support",
+        "marketing",
+        "design",
+        "education",
+        "sales",
+        "hr_recruiting",
+        "legal",
+        "finance",
+        "healthcare",
       ],
     },
   },
