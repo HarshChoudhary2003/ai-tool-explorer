@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
 import { FilterBar } from "@/components/FilterBar";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import { Loader2 } from "lucide-react";
 
 export default function Tools() {
@@ -58,11 +59,12 @@ export default function Tools() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-secondary">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold gradient-text mb-4">AI Tools Directory</h1>
-          <p className="text-muted-foreground text-lg">
+    <div className="min-h-screen bg-gradient-secondary flex flex-col">
+      <Header />
+      <div className="container mx-auto px-4 py-6 sm:py-8 flex-1">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold gradient-text mb-2 sm:mb-4">AI Tools Directory</h1>
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg">
             Explore {tools.length} cutting-edge AI tools across all categories
           </p>
         </div>
@@ -70,11 +72,11 @@ export default function Tools() {
         <FilterBar totalCount={filteredTools.length} />
 
         {loading ? (
-          <div className="flex justify-center items-center min-h-[400px]">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <div className="flex justify-center items-center min-h-[300px] sm:min-h-[400px]">
+            <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredTools.map((tool) => (
               <ToolCard key={tool.id} tool={tool} />
             ))}
