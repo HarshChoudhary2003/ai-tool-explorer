@@ -41,12 +41,12 @@ const Header = () => {
                 {link.name}
               </Link>
             ))}
-            <a
-              href="#how-it-works"
+            <Link
+              to="/#how-it-works"
               className="text-muted-foreground hover:text-primary transition-colors font-medium"
             >
               How it Works
-            </a>
+            </Link>
           </nav>
 
           {/* Desktop CTA */}
@@ -75,13 +75,13 @@ const Header = () => {
                     {link.name}
                   </Link>
                 ))}
-                <a
-                  href="#how-it-works"
+                <Link
+                  to="/#how-it-works"
                   onClick={() => setIsOpen(false)}
                   className="text-lg font-medium hover:text-primary transition-colors"
                 >
                   How it Works
-                </a>
+                </Link>
                 <Button asChild className="mt-4">
                   <Link to="/recommend" onClick={() => setIsOpen(false)}>
                     Get Started
