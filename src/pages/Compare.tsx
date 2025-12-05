@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Plus, X, ExternalLink, Check, Minus } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function Compare() {
   const [searchParams] = useSearchParams();
@@ -62,18 +63,22 @@ export default function Compare() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-secondary flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-gradient-secondary flex flex-col">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-secondary">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold gradient-text mb-4">Compare AI Tools</h1>
-          <p className="text-muted-foreground text-lg">
+    <div className="min-h-screen bg-gradient-secondary flex flex-col">
+      <Header />
+      <div className="container mx-auto px-4 py-6 sm:py-8 flex-1">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold gradient-text mb-2 sm:mb-4">Compare AI Tools</h1>
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg">
             Select up to 3 tools to compare their features side-by-side
           </p>
         </div>

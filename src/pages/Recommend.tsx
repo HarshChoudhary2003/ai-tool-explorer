@@ -11,6 +11,7 @@ import { Sparkles, Loader2, ExternalLink, TrendingUp, DollarSign } from "lucide-
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 
 export default function Recommend() {
   const [task, setTask] = useState("");
@@ -52,18 +53,19 @@ export default function Recommend() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-secondary">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-secondary flex flex-col">
+      <Header />
+      <div className="container mx-auto px-4 py-6 sm:py-8 flex-1">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
+          <div className="text-center mb-6 sm:mb-8">
             <Badge className="mb-4 glass border-primary/30 text-primary">
               <Sparkles className="h-4 w-4 mr-2" />
               AI-Powered
             </Badge>
-            <h1 className="text-4xl font-bold gradient-text mb-4">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold gradient-text mb-2 sm:mb-4">
               Get Personalized Tool Recommendations
             </h1>
-            <p className="text-muted-foreground text-lg">
+            <p className="text-muted-foreground text-sm sm:text-base lg:text-lg">
               Tell us what you need, and our AI will suggest the best tools for you
             </p>
           </div>
