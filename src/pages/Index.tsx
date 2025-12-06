@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { Testimonials } from "@/components/Testimonials";
+import { FAQSection } from "@/components/FAQSection";
 import { motion } from "framer-motion";
 
 export default function Index() {
@@ -308,6 +310,12 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <Testimonials />
+
+      {/* FAQ */}
+      <FAQSection />
 
       <Footer />
     </div>
