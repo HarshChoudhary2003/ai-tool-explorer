@@ -8,14 +8,20 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, ExternalLink, Star, Zap, DollarSign, Check, X, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { BookmarkButton } from "@/components/BookmarkButton";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 
 export default function ToolDetails() {
   const { id } = useParams();
   const [tool, setTool] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { addToRecentlyViewed } = useRecentlyViewed();
 
   useEffect(() => {
-    if (id) fetchTool();
+    if (id) {
+      fetchTool();
+      addToRecentlyViewed(id);
+    }
   }, [id]);
 
   const fetchTool = async () => {
@@ -97,9 +103,12 @@ export default function ToolDetails() {
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Star className="h-5 w-5 text-primary fill-primary" />
-                    <span className="text-2xl font-bold">{tool.rating}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-5 w-5 text-primary fill-primary" />
+                      <span className="text-2xl font-bold">{tool.rating}</span>
+                    </div>
+                    <BookmarkButton toolId={tool.id} variant="default" />
                   </div>
                 </div>
               </CardHeader>
