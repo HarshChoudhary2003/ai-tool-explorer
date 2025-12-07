@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Star, Zap } from "lucide-react";
+import { BookmarkButton } from "@/components/BookmarkButton";
 
 interface ToolCardProps {
   tool: any;
@@ -52,6 +53,7 @@ export function ToolCard({ tool }: ToolCardProps) {
               )}
             </div>
           </div>
+          <BookmarkButton toolId={tool.id} />
         </div>
         <CardDescription className="line-clamp-2">{tool.description}</CardDescription>
       </CardHeader>
