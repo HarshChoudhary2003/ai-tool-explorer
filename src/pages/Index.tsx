@@ -108,7 +108,7 @@ export default function Index() {
               for Your Needs
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-              Explore, compare, and find the perfect AI tools for your projects. 
+              Explore, compare, and find the perfect AI tools for your projects.
               From LLMs to image generators, we've got you covered.
             </p>
 
@@ -191,7 +191,7 @@ export default function Index() {
 
       {/* How It Works */}
       <section id="how-it-works" className="container mx-auto px-4 py-12 sm:py-16 lg:py-20">
-        <motion.div 
+        <motion.div
           className="text-center mb-10 sm:mb-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -204,33 +204,33 @@ export default function Index() {
           </Badge>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">How It Works</h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
-            Finding the right AI tool has never been easier. Follow these simple steps 
+            Finding the right AI tool has never been easier. Follow these simple steps
             to discover the perfect solution for your needs.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {howItWorksSteps.map((item, index) => (
-            <motion.div 
+            <motion.div
               key={item.step}
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: "-50px" }}
-              transition={{ 
-                duration: 0.5, 
+              transition={{
+                duration: 0.5,
                 delay: index * 0.15,
                 ease: [0.25, 0.46, 0.45, 0.94]
               }}
               whileHover={{ scale: 1.05, y: -5 }}
               className="glass p-6 sm:p-8 rounded-xl space-y-4 card-shadow relative group cursor-pointer"
             >
-              <motion.div 
+              <motion.div
                 className="absolute -top-3 -left-3 h-10 w-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm"
                 initial={{ scale: 0 }}
                 whileInView={{ scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ 
-                  duration: 0.4, 
+                transition={{
+                  duration: 0.4,
                   delay: index * 0.15 + 0.2,
                   type: "spring",
                   stiffness: 200
@@ -260,7 +260,7 @@ export default function Index() {
           ))}
         </div>
 
-        <motion.div 
+        <motion.div
           className="text-center mt-10 sm:mt-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

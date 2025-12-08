@@ -16,7 +16,7 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Your ultimate destination for discovering, comparing, and finding the perfect AI tools 
+              Your ultimate destination for discovering, comparing, and finding the perfect AI tools
               for your projects. Curated with care by industry experts.
             </p>
             <div className="flex items-center gap-3">
@@ -71,7 +71,7 @@ const Footer = () => {
               © {new Date().getFullYear()} AI Tools Explorer. All rights reserved.
             </div>
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              Developed with <Heart className="h-4 w-4 text-red-500 mx-1" /> by{" "}
+              Developed  by{" "}
               <span className="font-semibold text-primary ml-1">CodeMeetsData</span>
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground">

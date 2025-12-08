@@ -166,7 +166,7 @@ export default function Compare() {
                   {selectedTools.map((tool: any) => {
                     const value = tool[row.key];
                     const displayValue = row.format ? row.format(value) : value;
-                    
+
                     return (
                       <div key={tool.id} className="p-6 flex items-center">
                         {typeof value === "boolean" ? (

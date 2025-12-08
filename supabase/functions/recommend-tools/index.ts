@@ -1,3 +1,4 @@
+// Setup type definitions for built-in Supabase Runtime APIs
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -34,10 +35,10 @@ Deno.serve(async (req) => {
 
     if (toolsError) throw toolsError;
 
-    // Get AI recommendation using Lovable AI
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    // Get AI recommendation using AI Service
+    const AI_SERVICE_API_KEY = Deno.env.get("AI_SERVICE_API_KEY");
+    if (!AI_SERVICE_API_KEY) {
+      throw new Error("AI_SERVICE_API_KEY is not configured");
     }
 
     const systemPrompt = `You are an AI tool recommendation expert. Analyze the user's task and requirements to recommend the top 3 most suitable AI tools from the provided list.
@@ -65,7 +66,7 @@ ${tools.map((t: any) => `- ${t.name} (ID: ${t.id}): ${t.description}. Category: 
     const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Authorization": `Bearer ${AI_SERVICE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -115,14 +116,14 @@ ${tools.map((t: any) => `- ${t.name} (ID: ${t.id}): ${t.description}. Category: 
       console.log("Using fallback recommendation logic");
       const scored = tools.map((tool: any) => {
         let score = tool.rating * 20 + (tool.popularity_score / 1000);
-        
+
         // Budget matching
         if (budget === "free" && tool.pricing === "free") score += 50;
         if (budget === "under_20" && (tool.pricing === "free" || tool.pricing === "freemium")) score += 30;
-        
+
         // API requirement
         if (requirements?.toLowerCase().includes("api") && tool.has_api) score += 30;
-        
+
         return { tool, score, reasoning: `This tool has a ${tool.rating} rating and is popular with ${tool.popularity_score.toLocaleString()} users. It offers ${tool.tasks?.slice(0, 3).join(", ")} capabilities.` };
       });
 
