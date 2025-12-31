@@ -174,29 +174,29 @@ export default function Trending() {
     <div className="min-h-screen bg-gradient-secondary flex flex-col">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-6 sm:py-8">
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8 sm:mb-12"
         >
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-4">
-            <Flame className="h-4 w-4" />
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">
+            <Flame className="h-3 w-3 sm:h-4 sm:w-4" />
             Trending Now
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
             Discover What's <span className="text-primary">Hot</span>
           </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-4">
             See the most popular AI tools based on views, bookmarks, and ratings from our community.
           </p>
         </motion.div>
 
         {/* Time Range Filter */}
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-center sm:justify-end mb-4 sm:mb-6">
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-[180px] glass">
+            <SelectTrigger className="w-[160px] sm:w-[180px] glass">
               <SelectValue placeholder="Time range" />
             </SelectTrigger>
             <SelectContent>
@@ -207,40 +207,44 @@ export default function Trending() {
           </Select>
         </div>
 
-        <Tabs defaultValue="trending" className="space-y-8">
-          <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full max-w-2xl mx-auto glass">
-            <TabsTrigger value="trending" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Trending
+        <Tabs defaultValue="trending" className="space-y-6 sm:space-y-8">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full max-w-2xl mx-auto glass gap-1">
+            <TabsTrigger value="trending" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
+              <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Trending</span>
+              <span className="xs:hidden">Hot</span>
             </TabsTrigger>
-            <TabsTrigger value="bookmarked" className="flex items-center gap-2">
-              <Bookmark className="h-4 w-4" />
-              Most Saved
+            <TabsTrigger value="bookmarked" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
+              <Bookmark className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Most Saved</span>
+              <span className="xs:hidden">Saved</span>
             </TabsTrigger>
-            <TabsTrigger value="rated" className="flex items-center gap-2">
-              <Star className="h-4 w-4" />
-              Top Rated
+            <TabsTrigger value="rated" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
+              <Star className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Top Rated</span>
+              <span className="xs:hidden">Top</span>
             </TabsTrigger>
-            <TabsTrigger value="rising" className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Rising Stars
+            <TabsTrigger value="rising" className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3">
+              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline">Rising Stars</span>
+              <span className="xs:hidden">New</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Trending Tab */}
-          <TabsContent value="trending" className="space-y-6">
+          <TabsContent value="trending" className="space-y-4 sm:space-y-6">
             <Card className="glass card-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Flame className="h-5 w-5 text-orange-500" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Flame className="h-4 w-4 sm:h-5 sm:w-5 text-orange-500" />
                   Trending This Week
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Tools with the highest engagement based on views, bookmarks, and ratings
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="px-3 sm:px-6">
+                <div className="space-y-3 sm:space-y-4">
                   {trendingTools.map((item, index) => (
                     <motion.div
                       key={item.tool_id}
@@ -250,23 +254,39 @@ export default function Trending() {
                     >
                       {item.tool && (
                         <Card className="glass hover:border-primary/50 transition-all">
-                          <CardContent className="p-4">
-                            <div className="flex items-center gap-4">
-                              <Badge className={`${getRankBadge(index)} text-lg font-bold w-10 h-10 flex items-center justify-center rounded-full`}>
+                          <CardContent className="p-3 sm:p-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                              <Badge className={`${getRankBadge(index)} text-base sm:text-lg font-bold w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full flex-shrink-0 self-start sm:self-center`}>
                                 {index + 1}
                               </Badge>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold text-lg">{item.tool.name}</h3>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2 mb-1">
+                                  <h3 className="font-semibold text-base sm:text-lg truncate">{item.tool.name}</h3>
                                   <Badge variant="outline" className="text-xs">
                                     {item.tool.category.split("_").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
                                   </Badge>
                                 </div>
-                                <p className="text-sm text-muted-foreground line-clamp-1">
+                                <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                                   {item.tool.description}
                                 </p>
+                                {/* Mobile Stats */}
+                                <div className="flex items-center gap-4 mt-2 sm:hidden text-xs text-muted-foreground">
+                                  <div className="flex items-center gap-1">
+                                    <Eye className="h-3 w-3" />
+                                    <span>{item.view_count}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Bookmark className="h-3 w-3" />
+                                    <span>{item.bookmark_count}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Star className="h-3 w-3 text-yellow-500" />
+                                    <span>{item.tool.rating}</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+                              {/* Desktop Stats */}
+                              <div className="hidden md:flex items-center gap-4 lg:gap-6 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                   <Eye className="h-4 w-4" />
                                   <span>{item.view_count}</span>
@@ -280,12 +300,12 @@ export default function Trending() {
                                   <span>{item.tool.rating}</span>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-0">
                                 <div className="flex items-center gap-1 text-primary">
-                                  <ArrowUp className="h-4 w-4" />
-                                  <span className="font-bold">{Math.round(item.trending_score)}</span>
+                                  <ArrowUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                                  <span className="font-bold text-sm sm:text-base">{Math.round(item.trending_score)}</span>
                                 </div>
-                                <Button asChild size="sm">
+                                <Button asChild size="sm" className="text-xs sm:text-sm">
                                   <a href={`/tools/${item.tool_id}`}>View</a>
                                 </Button>
                               </div>
@@ -303,24 +323,24 @@ export default function Trending() {
           {/* Most Bookmarked Tab */}
           <TabsContent value="bookmarked">
             <Card className="glass card-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bookmark className="h-5 w-5 text-primary" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Bookmark className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                   Most Bookmarked
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Tools that users save the most for later reference
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {mostBookmarked.length > 0 ? (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {mostBookmarked.map((tool) => (
                       <ToolCard key={tool.id} tool={tool} />
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">
+                  <p className="text-center text-muted-foreground py-8 text-sm sm:text-base">
                     No bookmark data available for this time range
                   </p>
                 )}
@@ -331,17 +351,17 @@ export default function Trending() {
           {/* Top Rated Tab */}
           <TabsContent value="rated">
             <Card className="glass card-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="h-5 w-5 text-yellow-500" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Star className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-500" />
                   Top Rated Tools
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   Highest-rated AI tools by our community
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {topRated.map((tool) => (
                     <ToolCard key={tool.id} tool={tool} />
                   ))}
@@ -353,24 +373,24 @@ export default function Trending() {
           {/* Rising Stars Tab */}
           <TabsContent value="rising">
             <Card className="glass card-shadow">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-secondary" />
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                  <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-secondary" />
                   Rising Stars
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
                   New tools that are quickly gaining traction
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {risingStars.length > 0 ? (
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {risingStars.map((tool) => (
                       <ToolCard key={tool.id} tool={tool} />
                     ))}
                   </div>
                 ) : (
-                  <p className="text-center text-muted-foreground py-8">
+                  <p className="text-center text-muted-foreground py-8 text-sm sm:text-base">
                     No new tools added this week
                   </p>
                 )}
