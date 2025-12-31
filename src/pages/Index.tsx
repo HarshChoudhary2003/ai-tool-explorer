@@ -100,7 +100,7 @@ export default function Index() {
           <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
             <Badge className="mb-4 glass border-primary/30 text-primary">
               <Sparkles className="h-4 w-4 mr-2" />
-              200+ AI Tools Curated
+              500+ AI Tools Curated
             </Badge>
             <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight">
               Discover the{" "}
