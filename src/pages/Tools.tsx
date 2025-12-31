@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
@@ -11,18 +11,17 @@ export default function Tools() {
   const [searchParams] = useSearchParams();
   const [tools, setTools] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filteredTools, setFilteredTools] = useState<any[]>([]);
 
   const category = searchParams.get("category");
   const search = searchParams.get("search");
+  const pricing = searchParams.get("pricing");
+  const rating = searchParams.get("rating");
+  const hasApi = searchParams.get("hasApi");
+  const sort = searchParams.get("sort");
 
   useEffect(() => {
     fetchTools();
   }, []);
-
-  useEffect(() => {
-    filterTools();
-  }, [tools, category, search]);
 
   const fetchTools = async () => {
     setLoading(true);
@@ -39,24 +38,60 @@ export default function Tools() {
     setLoading(false);
   };
 
-  const filterTools = () => {
+  const filteredTools = useMemo(() => {
     let filtered = [...tools];
 
+    // Category filter
     if (category) {
       filtered = filtered.filter((tool) => tool.category === category);
     }
 
+    // Search filter
     if (search) {
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(
         (tool) =>
           tool.name.toLowerCase().includes(searchLower) ||
-          tool.description.toLowerCase().includes(searchLower)
+          tool.description.toLowerCase().includes(searchLower) ||
+          tool.tasks?.some((task: string) => task.toLowerCase().includes(searchLower))
       );
     }
 
-    setFilteredTools(filtered);
-  };
+    // Pricing filter
+    if (pricing) {
+      filtered = filtered.filter((tool) => tool.pricing === pricing);
+    }
+
+    // Rating filter
+    if (rating) {
+      const minRating = parseFloat(rating);
+      filtered = filtered.filter((tool) => (tool.rating || 0) >= minRating);
+    }
+
+    // API availability filter
+    if (hasApi === "true") {
+      filtered = filtered.filter((tool) => tool.has_api === true);
+    }
+
+    // Sorting
+    switch (sort) {
+      case "rating":
+        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        break;
+      case "name":
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "newest":
+        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        break;
+      case "popularity":
+      default:
+        filtered.sort((a, b) => (b.popularity_score || 0) - (a.popularity_score || 0));
+        break;
+    }
+
+    return filtered;
+  }, [tools, category, search, pricing, rating, hasApi, sort]);
 
   return (
     <div className="min-h-screen bg-gradient-secondary flex flex-col">
