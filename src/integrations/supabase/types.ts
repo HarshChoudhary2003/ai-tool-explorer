@@ -80,11 +80,13 @@ export type Database = {
       blog_posts: {
         Row: {
           author_id: string | null
+          category: string | null
           content: string
           cover_image: string | null
           created_at: string
           excerpt: string | null
           id: string
+          is_featured: boolean | null
           is_published: boolean | null
           published_at: string | null
           slug: string
@@ -93,11 +95,13 @@ export type Database = {
         }
         Insert: {
           author_id?: string | null
+          category?: string | null
           content: string
           cover_image?: string | null
           created_at?: string
           excerpt?: string | null
           id?: string
+          is_featured?: boolean | null
           is_published?: boolean | null
           published_at?: string | null
           slug: string
@@ -106,11 +110,13 @@ export type Database = {
         }
         Update: {
           author_id?: string | null
+          category?: string | null
           content?: string
           cover_image?: string | null
           created_at?: string
           excerpt?: string | null
           id?: string
+          is_featured?: boolean | null
           is_published?: boolean | null
           published_at?: string | null
           slug?: string
@@ -347,6 +353,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tool_submissions: {
+        Row: {
+          additional_info: string | null
+          category: string
+          created_at: string
+          description: string
+          id: string
+          name: string
+          pricing: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitter_email: string
+          submitter_name: string | null
+          website_url: string
+        }
+        Insert: {
+          additional_info?: string | null
+          category: string
+          created_at?: string
+          description: string
+          id?: string
+          name: string
+          pricing: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitter_email: string
+          submitter_name?: string | null
+          website_url: string
+        }
+        Update: {
+          additional_info?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          pricing?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitter_email?: string
+          submitter_name?: string | null
+          website_url?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
