@@ -57,9 +57,26 @@ export function ContactForm() {
         variant: "destructive",
       });
     } else {
+      // Send confirmation email
+      try {
+        await supabase.functions.invoke("send-notification-email", {
+          body: {
+            type: "contact",
+            data: {
+              email: result.data.email,
+              name: result.data.name,
+              subject: result.data.subject || "General Inquiry",
+              message: result.data.message,
+            },
+          },
+        });
+      } catch (emailError) {
+        console.error("Email notification failed:", emailError);
+      }
+
       toast({
         title: "Message sent!",
-        description: "We'll get back to you soon.",
+        description: "We'll get back to you soon. Check your email for confirmation.",
       });
       setFormData({ name: "", email: "", subject: "", message: "" });
     }

@@ -22,6 +22,7 @@ const Header = () => {
     { name: "Tools", path: "/tools" },
     { name: "Compare", path: "/compare" },
     { name: "Recommend", path: "/recommend" },
+    { name: "Submit Tool", path: "/submit" },
     { name: "Blog", path: "/blog" },
     { name: "Contact", path: "/contact" },
   ];
