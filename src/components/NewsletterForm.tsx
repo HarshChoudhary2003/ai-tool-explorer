@@ -45,9 +45,23 @@ export function NewsletterForm({ className }: { className?: string }) {
         });
       }
     } else {
+      // Send welcome email
+      try {
+        await supabase.functions.invoke("send-notification-email", {
+          body: {
+            type: "newsletter_welcome",
+            data: {
+              email: result.data,
+            },
+          },
+        });
+      } catch (emailError) {
+        console.error("Email notification failed:", emailError);
+      }
+
       toast({
         title: "Subscribed!",
-        description: "You'll receive our latest AI tool updates.",
+        description: "Check your email for a welcome message.",
       });
       setEmail("");
     }
