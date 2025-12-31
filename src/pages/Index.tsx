@@ -18,9 +18,11 @@ export default function Index() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [trendingTools, setTrendingTools] = useState<any[]>([]);
+  const [toolCount, setToolCount] = useState<number>(0);
 
   useEffect(() => {
     fetchTrendingTools();
+    fetchToolCount();
   }, []);
 
   // Scroll to hash on navigation
@@ -34,6 +36,14 @@ export default function Index() {
       }
     }
   }, [location.hash]);
+
+  const fetchToolCount = async () => {
+    const { count } = await supabase
+      .from("ai_tools")
+      .select("*", { count: "exact", head: true });
+
+    if (count) setToolCount(count);
+  };
 
   const fetchTrendingTools = async () => {
     const { data } = await supabase
@@ -66,7 +76,7 @@ export default function Index() {
     {
       step: "01",
       title: "Browse & Search",
-      description: "Explore our curated collection of 200+ AI tools. Filter by category, pricing, or search for specific features.",
+      description: "Explore our curated collection of 500+ AI tools. Filter by category, pricing, or search for specific features.",
       icon: Search,
     },
     {
@@ -100,7 +110,7 @@ export default function Index() {
           <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
             <Badge className="mb-4 glass border-primary/30 text-primary">
               <Sparkles className="h-4 w-4 mr-2" />
-              500+ AI Tools Curated
+              {toolCount > 0 ? `${toolCount}+ AI Tools Curated` : "500+ AI Tools Curated"}
             </Badge>
             <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight">
               Discover the{" "}
