@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/hooks/useTheme";
-import { WhatsAppButton } from "@/components/WhatsAppButton";
+
 import Index from "./pages/Index";
 import Tools from "./pages/Tools";
 import ToolDetails from "./pages/ToolDetails";
@@ -51,7 +51,7 @@ const App = () => (
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
-            <WhatsAppButton />
+            
           </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
