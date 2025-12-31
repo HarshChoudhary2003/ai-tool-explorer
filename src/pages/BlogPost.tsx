@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import DOMPurify from "dompurify";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -348,11 +349,15 @@ export default function BlogPost() {
         if (line.trim() === '') {
           return <br key={index} />;
         }
-        // Handle inline formatting
+        // Handle inline formatting with DOMPurify sanitization
         const formattedLine = line
           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
           .replace(/\*(.*?)\*/g, '<em>$1</em>');
-        return <p key={index} className="my-2" dangerouslySetInnerHTML={{ __html: formattedLine }} />;
+        const sanitizedLine = DOMPurify.sanitize(formattedLine, {
+          ALLOWED_TAGS: ['strong', 'em'],
+          ALLOWED_ATTR: []
+        });
+        return <p key={index} className="my-2" dangerouslySetInnerHTML={{ __html: sanitizedLine }} />;
       });
   };
 
