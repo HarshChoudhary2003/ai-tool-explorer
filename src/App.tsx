@@ -11,6 +11,7 @@ import Tools from "./pages/Tools";
 import ToolDetails from "./pages/ToolDetails";
 import Compare from "./pages/Compare";
 import Recommend from "./pages/Recommend";
+import Trending from "./pages/Trending";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/tools/:id" element={<ToolDetails />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="/recommend" element={<Recommend />} />
+              <Route path="/trending" element={<Trending />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/admin" element={<Admin />} />

@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { ToolCard } from "@/components/ToolCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Loader2, Bookmark, Clock, Star, Settings, LogOut } from "lucide-react";
+import { CategoryPreferences } from "@/components/CategoryPreferences";
+import { Loader2, Bookmark, Clock, Star, Settings, LogOut, Bell } from "lucide-react";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -215,6 +216,9 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         )}
+
+        {/* Category Notification Preferences */}
+        <CategoryPreferences />
       </main>
 
       <Footer />
