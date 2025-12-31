@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.recommend-tools]
 verify_jwt = false
+
+[functions.notify-new-tools]
+verify_jwt = false

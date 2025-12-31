@@ -10,12 +10,17 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { BookmarkButton } from "@/components/BookmarkButton";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useToolViews } from "@/hooks/useToolViews";
+import { ReviewsSection } from "@/components/ReviewsSection";
 
 export default function ToolDetails() {
   const { id } = useParams();
   const [tool, setTool] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { addToRecentlyViewed } = useRecentlyViewed();
+  
+  // Track views in database
+  useToolViews(id);
 
   useEffect(() => {
     if (id) {
@@ -184,6 +189,9 @@ export default function ToolDetails() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Reviews Section */}
+            <ReviewsSection toolId={tool.id} toolName={tool.name} />
           </div>
 
           {/* Sidebar */}

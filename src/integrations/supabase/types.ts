@@ -262,6 +262,35 @@ export type Database = {
         }
         Relationships: []
       }
+      review_helpful_votes: {
+        Row: {
+          created_at: string
+          id: string
+          review_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          review_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          review_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_helpful_votes_review_id_fkey"
+            columns: ["review_id"]
+            isOneToOne: false
+            referencedRelation: "tool_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       testimonials: {
         Row: {
           avatar_url: string | null
@@ -319,9 +348,39 @@ export type Database = {
         }
         Relationships: []
       }
+      tool_notifications_log: {
+        Row: {
+          id: string
+          sent_at: string
+          tool_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          sent_at?: string
+          tool_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          sent_at?: string
+          tool_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tool_notifications_log_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "ai_tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tool_ratings: {
         Row: {
           created_at: string
+          helpful_count: number | null
           id: string
           rating: number
           review: string | null
@@ -330,6 +389,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          helpful_count?: number | null
           id?: string
           rating: number
           review?: string | null
@@ -338,6 +398,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          helpful_count?: number | null
           id?: string
           rating?: number
           review?: string | null
@@ -402,6 +463,62 @@ export type Database = {
         }
         Relationships: []
       }
+      tool_views: {
+        Row: {
+          id: string
+          session_id: string | null
+          tool_id: string
+          user_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          session_id?: string | null
+          tool_id: string
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          session_id?: string | null
+          tool_id?: string
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tool_views_tool_id_fkey"
+            columns: ["tool_id"]
+            isOneToOne: false
+            referencedRelation: "ai_tools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_category_interests: {
+        Row: {
+          category: Database["public"]["Enums"]["tool_category"]
+          created_at: string
+          email_notifications: boolean | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["tool_category"]
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["tool_category"]
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -428,6 +545,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_trending_tools: {
+        Args: { days_back?: number; limit_count?: number }
+        Returns: {
+          bookmark_count: number
+          rating_count: number
+          tool_id: string
+          tool_name: string
+          trending_score: number
+          view_count: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
