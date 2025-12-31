@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sparkles, GitCompare, Zap, TrendingUp, MousePointer, Filter, Bot, ArrowRight } from "lucide-react";
+import { Search, Sparkles, GitCompare, Zap, TrendingUp, MousePointer, Filter, Bot, ArrowRight, Image, Mic, Video, Code, PenTool, BarChart3 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,6 +12,12 @@ import Header from "@/components/Header";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQSection } from "@/components/FAQSection";
 import { motion } from "framer-motion";
+import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
+
+interface CategoryCount {
+  category: string;
+  count: number;
+}
 
 export default function Index() {
   const navigate = useNavigate();
@@ -19,10 +25,14 @@ export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
   const [trendingTools, setTrendingTools] = useState<any[]>([]);
   const [toolCount, setToolCount] = useState<number>(0);
+  const [categoryCounts, setCategoryCounts] = useState<CategoryCount[]>([]);
+  
+  const { count: animatedCount } = useAnimatedCounter(toolCount, 2000);
 
   useEffect(() => {
     fetchTrendingTools();
     fetchToolCount();
+    fetchCategoryCounts();
   }, []);
 
   // Scroll to hash on navigation
@@ -45,6 +55,26 @@ export default function Index() {
     if (count) setToolCount(count);
   };
 
+  const fetchCategoryCounts = async () => {
+    const { data } = await supabase
+      .from("ai_tools")
+      .select("category");
+
+    if (data) {
+      const counts: Record<string, number> = {};
+      data.forEach((item) => {
+        counts[item.category] = (counts[item.category] || 0) + 1;
+      });
+      
+      const sortedCounts = Object.entries(counts)
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 8);
+      
+      setCategoryCounts(sortedCounts);
+    }
+  };
+
   const fetchTrendingTools = async () => {
     const { data } = await supabase
       .from("ai_tools")
@@ -63,13 +93,34 @@ export default function Index() {
     }
   };
 
+  const categoryIcons: Record<string, any> = {
+    llm: Sparkles,
+    image_generation: Image,
+    voice: Mic,
+    automation: Zap,
+    no_code: Code,
+    video: Video,
+    audio: Mic,
+    productivity: BarChart3,
+    code_assistant: Code,
+    data_analysis: BarChart3,
+    writing: PenTool,
+  };
+
+  const formatCategory = (cat: string) => {
+    return cat
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   const categories = [
     { name: "LLMs", value: "llm", icon: Sparkles },
-    { name: "Image Gen", value: "image_generation", icon: Sparkles },
-    { name: "Voice", value: "voice", icon: Zap },
+    { name: "Image Gen", value: "image_generation", icon: Image },
+    { name: "Voice", value: "voice", icon: Mic },
     { name: "Automation", value: "automation", icon: Zap },
-    { name: "No-Code", value: "no_code", icon: Sparkles },
-    { name: "Video", value: "video", icon: Zap },
+    { name: "No-Code", value: "no_code", icon: Code },
+    { name: "Video", value: "video", icon: Video },
   ];
 
   const howItWorksSteps = [
@@ -108,10 +159,19 @@ export default function Index() {
         <div className="absolute inset-0 bg-gradient-hero opacity-10"></div>
         <div className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
-            <Badge className="mb-4 glass border-primary/30 text-primary">
-              <Sparkles className="h-4 w-4 mr-2" />
-              {toolCount > 0 ? `${toolCount}+ AI Tools Curated` : "500+ AI Tools Curated"}
-            </Badge>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Badge className="mb-4 glass border-primary/30 text-primary text-base sm:text-lg px-4 py-2">
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                <span className="font-bold tabular-nums">
+                  {animatedCount > 0 ? animatedCount : "500"}+
+                </span>
+                <span className="ml-1">AI Tools Curated</span>
+              </Badge>
+            </motion.div>
             <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold leading-tight">
               Discover the{" "}
               <span className="gradient-text">Best AI Tools</span>{" "}
@@ -180,6 +240,55 @@ export default function Index() {
           ))}
         </div>
       </section>
+
+      {/* Category Breakdown Stats */}
+      {categoryCounts.length > 0 && (
+        <section className="container mx-auto px-4 py-8 sm:py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-6 sm:mb-8"
+          >
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Tools by Category</h2>
+            <p className="text-muted-foreground text-sm sm:text-base">
+              Explore our collection across {categoryCounts.length}+ categories
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+            {categoryCounts.map((item, index) => {
+              const IconComponent = categoryIcons[item.category] || Sparkles;
+              return (
+                <motion.div
+                  key={item.category}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Link
+                    to={`/tools?category=${item.category}`}
+                    className="block glass p-4 sm:p-6 rounded-xl text-center hover:border-primary/50 transition-all card-shadow group"
+                  >
+                    <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-3">
+                      <IconComponent className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">
+                      {item.count}
+                    </div>
+                    <div className="text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">
+                      {formatCategory(item.category)}
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Trending Tools */}
       <section className="container mx-auto px-4 py-12 sm:py-16">
