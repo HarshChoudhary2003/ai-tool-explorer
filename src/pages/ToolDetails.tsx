@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, ExternalLink, Star, Zap, DollarSign, Check, X, Loader2 } from "lucide-react";
+import { ExternalLink, Star, Zap, DollarSign, Check, X, Loader2 } from "lucide-react";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { BookmarkButton } from "@/components/BookmarkButton";
@@ -13,6 +13,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useToolViews } from "@/hooks/useToolViews";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { useSEO, generateToolJsonLd } from "@/hooks/useSEO";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 export default function ToolDetails() {
   const { id } = useParams();
@@ -129,12 +130,12 @@ export default function ToolDetails() {
     <div className="min-h-screen bg-gradient-secondary flex flex-col">
       <Header />
       <div className="container mx-auto px-4 py-6 sm:py-8 flex-1">
-        <Button asChild variant="ghost" className="mb-4 sm:mb-6">
-          <Link to="/tools">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Tools
-          </Link>
-        </Button>
+        <Breadcrumb
+          items={[
+            { label: "Tools", href: "/tools" },
+            { label: tool.name },
+          ]}
+        />
 
         <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Content */}
