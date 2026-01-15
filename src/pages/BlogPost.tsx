@@ -6,8 +6,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowLeft, User, Clock, Loader2 } from "lucide-react";
+import { Calendar, User, Clock, Loader2, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { Breadcrumb } from "@/components/Breadcrumb";
 
 interface BlogPost {
   id: string;
@@ -400,13 +401,12 @@ export default function BlogPost() {
         {/* Hero section */}
         <div className="bg-gradient-to-b from-primary/5 to-transparent py-12">
           <div className="container mx-auto px-4">
-            <Link
-              to="/blog"
-              className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6"
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Blog
-            </Link>
+            <Breadcrumb
+              items={[
+                { label: "Blog", href: "/blog" },
+                { label: post.title },
+              ]}
+            />
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
