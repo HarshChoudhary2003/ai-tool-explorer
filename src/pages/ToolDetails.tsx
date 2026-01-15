@@ -12,6 +12,7 @@ import { BookmarkButton } from "@/components/BookmarkButton";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useToolViews } from "@/hooks/useToolViews";
 import { ReviewsSection } from "@/components/ReviewsSection";
+import { useSEO, generateToolJsonLd } from "@/hooks/useSEO";
 
 export default function ToolDetails() {
   const { id } = useParams();
@@ -45,6 +46,58 @@ export default function ToolDetails() {
     setLoading(false);
   };
 
+  const formatCategory = (cat: string) => {
+    return cat.split("_").map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+  };
+
+  // Truncate description for meta tag (max 155 chars)
+  const getMetaDescription = (description: string) => {
+    if (!description) return undefined;
+    if (description.length <= 155) return description;
+    return description.substring(0, 152) + "...";
+  };
+
+  // Dynamic SEO for tool page
+  useSEO(tool ? {
+    title: `${tool.name} - AI Tools Explorer`,
+    description: getMetaDescription(tool.description),
+    url: `${window.location.origin}/tools/${tool.id}`,
+    type: "website",
+  } : {});
+
+  // Add JSON-LD structured data
+  useEffect(() => {
+    if (!tool) return;
+
+    const jsonLd = generateToolJsonLd({
+      id: tool.id,
+      name: tool.name,
+      description: tool.description,
+      rating: tool.rating,
+      pricing: tool.pricing,
+      website_url: tool.website_url,
+      category: tool.category,
+    });
+
+    // Create or update JSON-LD script
+    let script = document.querySelector('script[data-tool-jsonld]') as HTMLScriptElement;
+    if (!script) {
+      script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-tool-jsonld', 'true');
+      document.head.appendChild(script);
+    }
+    script.textContent = JSON.stringify(jsonLd);
+
+    // Cleanup on unmount
+    return () => {
+      const existingScript = document.querySelector('script[data-tool-jsonld]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, [tool]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-secondary flex flex-col">
@@ -71,10 +124,6 @@ export default function ToolDetails() {
       </div>
     );
   }
-
-  const formatCategory = (cat: string) => {
-    return cat.split("_").map((word: string) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-  };
 
   return (
     <div className="min-h-screen bg-gradient-secondary flex flex-col">
