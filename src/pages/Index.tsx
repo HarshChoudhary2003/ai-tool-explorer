@@ -12,6 +12,7 @@ import Header from "@/components/Header";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQSection } from "@/components/FAQSection";
 import { FeaturedTools } from "@/components/FeaturedTools";
+import { CategoryGrid } from "@/components/CategoryGrid";
 import { motion } from "framer-motion";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 
@@ -275,7 +276,7 @@ export default function Index() {
                   whileHover={{ scale: 1.05 }}
                 >
                   <Link
-                    to={`/tools?category=${item.category}`}
+                    to={`/category/${item.category}`}
                     className="block glass p-4 sm:p-6 rounded-xl text-center hover:border-primary/50 transition-all card-shadow group"
                   >
                     <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-primary/20 flex items-center justify-center mx-auto mb-3">
@@ -294,6 +295,9 @@ export default function Index() {
           </div>
         </section>
       )}
+
+      {/* Category Grid */}
+      <CategoryGrid />
 
       {/* Featured Tools Section */}
       <FeaturedTools />
