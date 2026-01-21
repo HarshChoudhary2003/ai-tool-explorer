@@ -21,6 +21,7 @@ import BlogPost from "./pages/BlogPost";
 import SubmitTool from "./pages/SubmitTool";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Category from "./pages/Category";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/tools" element={<Tools />} />
               <Route path="/tools/:id" element={<ToolDetails />} />
+              <Route path="/category/:slug" element={<Category />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="/recommend" element={<Recommend />} />
               <Route path="/trending" element={<Trending />} />
