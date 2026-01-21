@@ -27,6 +27,7 @@ export function FilterBar({ totalCount }: FilterBarProps) {
     { value: "llm", label: "LLMs" },
     { value: "image_generation", label: "Image Generation" },
     { value: "voice", label: "Voice & Audio" },
+    { value: "audio", label: "Audio & Music" },
     { value: "automation", label: "Automation" },
     { value: "no_code", label: "No-Code" },
     { value: "video", label: "Video" },

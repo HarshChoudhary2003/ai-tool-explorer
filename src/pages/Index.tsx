@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sparkles, GitCompare, Zap, TrendingUp, MousePointer, Filter, Bot, ArrowRight, Image, Mic, Video, Code, PenTool, BarChart3 } from "lucide-react";
+import { Search, Sparkles, GitCompare, Zap, TrendingUp, MousePointer, Filter, Bot, ArrowRight, Image, Mic, Video, Code, PenTool, BarChart3, Headphones, Users, Briefcase, Palette } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQSection } from "@/components/FAQSection";
+import { FeaturedTools } from "@/components/FeaturedTools";
 import { motion } from "framer-motion";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
 
@@ -100,7 +101,7 @@ export default function Index() {
     automation: Zap,
     no_code: Code,
     video: Video,
-    audio: Mic,
+    audio: Headphones,
     productivity: BarChart3,
     code_assistant: Code,
     data_analysis: BarChart3,
@@ -118,9 +119,13 @@ export default function Index() {
     { name: "LLMs", value: "llm", icon: Sparkles },
     { name: "Image Gen", value: "image_generation", icon: Image },
     { name: "Voice", value: "voice", icon: Mic },
+    { name: "Audio", value: "audio", icon: Headphones },
     { name: "Automation", value: "automation", icon: Zap },
     { name: "No-Code", value: "no_code", icon: Code },
     { name: "Video", value: "video", icon: Video },
+    { name: "Code", value: "code_assistant", icon: Code },
+    { name: "Data", value: "data_analysis", icon: BarChart3 },
+    { name: "Productivity", value: "productivity", icon: PenTool },
   ];
 
   const howItWorksSteps = [
@@ -289,6 +294,9 @@ export default function Index() {
           </div>
         </section>
       )}
+
+      {/* Featured Tools Section */}
+      <FeaturedTools />
 
       {/* Trending Tools */}
       <section className="container mx-auto px-4 py-12 sm:py-16">
