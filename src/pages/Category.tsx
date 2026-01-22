@@ -14,10 +14,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Loader2, ArrowLeft, Search, Sparkles, X, ArrowUpDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { getCategoryBySlug, getAllCategories } from "@/data/categoryData";
 import { useSEO } from "@/hooks/useSEO";
+
+const ITEMS_PER_PAGE = 12;
 
 export default function Category() {
   const { slug } = useParams<{ slug: string }>();
@@ -25,6 +35,7 @@ export default function Category() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("popularity");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const categoryInfo = slug ? getCategoryBySlug(slug) : undefined;
 
@@ -94,6 +105,18 @@ export default function Category() {
   const topTools = useMemo(() => {
     return filteredAndSortedTools.filter((tool) => (tool.rating || 0) >= 4.3).slice(0, 6);
   }, [filteredAndSortedTools]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredAndSortedTools.length / ITEMS_PER_PAGE);
+  const paginatedTools = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAndSortedTools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredAndSortedTools, currentPage]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortBy]);
 
   const allCategories = getAllCategories();
 
@@ -267,18 +290,73 @@ export default function Category() {
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredAndSortedTools.map((tool, index) => (
-                <motion.div
-                  key={tool.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(index * 0.05, 0.5) }}
-                >
-                  <ToolCard tool={tool} />
-                </motion.div>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {paginatedTools.map((tool, index) => (
+                  <motion.div
+                    key={tool.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(index * 0.05, 0.5) }}
+                  >
+                    <ToolCard tool={tool} />
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-8">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                          className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1)
+                        .filter((page) => {
+                          // Show first, last, current, and neighbors
+                          if (page === 1 || page === totalPages) return true;
+                          if (Math.abs(page - currentPage) <= 1) return true;
+                          return false;
+                        })
+                        .map((page, index, arr) => {
+                          // Add ellipsis
+                          const showEllipsisBefore = index > 0 && page - arr[index - 1] > 1;
+                          return (
+                            <span key={page} className="flex items-center">
+                              {showEllipsisBefore && (
+                                <PaginationItem>
+                                  <span className="px-2 text-muted-foreground">...</span>
+                                </PaginationItem>
+                              )}
+                              <PaginationItem>
+                                <PaginationLink
+                                  onClick={() => setCurrentPage(page)}
+                                  isActive={currentPage === page}
+                                  className="cursor-pointer"
+                                >
+                                  {page}
+                                </PaginationLink>
+                              </PaginationItem>
+                            </span>
+                          );
+                        })}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                          className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
           )}
 
           {!loading && filteredAndSortedTools.length === 0 && (
