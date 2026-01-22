@@ -12,6 +12,7 @@ import Header from "@/components/Header";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQSection } from "@/components/FAQSection";
 import { FeaturedTools } from "@/components/FeaturedTools";
+import { NewThisWeek } from "@/components/NewThisWeek";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { motion } from "framer-motion";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
@@ -301,6 +302,9 @@ export default function Index() {
 
       {/* Featured Tools Section */}
       <FeaturedTools />
+
+      {/* New This Week */}
+      <NewThisWeek />
 
       {/* Trending Tools */}
       <section className="container mx-auto px-4 py-12 sm:py-16">
