@@ -6,7 +6,8 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, ArrowLeft, Search, Sparkles, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { getCategoryBySlug, getAllCategories } from "@/data/categoryData";
 import { useSEO } from "@/hooks/useSEO";
@@ -15,6 +16,7 @@ export default function Category() {
   const { slug } = useParams<{ slug: string }>();
   const [tools, setTools] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const categoryInfo = slug ? getCategoryBySlug(slug) : undefined;
 
@@ -46,9 +48,19 @@ export default function Category() {
     setLoading(false);
   };
 
+  const filteredTools = useMemo(() => {
+    if (!searchQuery.trim()) return tools;
+    const query = searchQuery.toLowerCase();
+    return tools.filter(
+      (tool) =>
+        tool.name.toLowerCase().includes(query) ||
+        tool.description.toLowerCase().includes(query)
+    );
+  }, [tools, searchQuery]);
+
   const topTools = useMemo(() => {
-    return tools.filter((tool) => (tool.rating || 0) >= 4.3).slice(0, 6);
-  }, [tools]);
+    return filteredTools.filter((tool) => (tool.rating || 0) >= 4.3).slice(0, 6);
+  }, [filteredTools]);
 
   const allCategories = getAllCategories();
 
@@ -175,12 +187,31 @@ export default function Category() {
         </section>
       )}
 
-      {/* All Tools */}
       <section className="py-12 flex-1">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8">
-            All {categoryInfo.name} Tools ({tools.length})
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <h2 className="text-2xl font-bold">
+              All {categoryInfo.name} Tools ({filteredTools.length})
+            </h2>
+            <div className="relative w-full sm:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search tools..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 pr-10"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+          </div>
 
           {loading ? (
             <div className="flex justify-center items-center min-h-[300px]">
@@ -188,7 +219,7 @@ export default function Category() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {tools.map((tool, index) => (
+              {filteredTools.map((tool, index) => (
                 <motion.div
                   key={tool.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -201,14 +232,20 @@ export default function Category() {
             </div>
           )}
 
-          {!loading && tools.length === 0 && (
+          {!loading && filteredTools.length === 0 && (
             <div className="text-center py-16">
               <p className="text-muted-foreground text-lg mb-4">
-                No tools found in this category yet
+                {searchQuery ? "No tools match your search" : "No tools found in this category yet"}
               </p>
-              <Link to="/submit">
-                <Button>Submit a Tool</Button>
-              </Link>
+              {searchQuery ? (
+                <Button variant="outline" onClick={() => setSearchQuery("")}>
+                  Clear Search
+                </Button>
+              ) : (
+                <Link to="/submit">
+                  <Button>Submit a Tool</Button>
+                </Link>
+              )}
             </div>
           )}
         </div>
