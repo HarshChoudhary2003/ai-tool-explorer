@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
@@ -22,10 +22,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Loader2, ArrowLeft, Search, Sparkles, X, ArrowUpDown } from "lucide-react";
+import { Loader2, ArrowLeft, Search, Sparkles, X, ArrowUpDown, List, Infinity } from "lucide-react";
 import { motion } from "framer-motion";
 import { getCategoryBySlug, getAllCategories } from "@/data/categoryData";
 import { useSEO } from "@/hooks/useSEO";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -36,6 +37,8 @@ export default function Category() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("popularity");
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<"pagination" | "infinite">("pagination");
+  const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_PAGE);
 
   const categoryInfo = slug ? getCategoryBySlug(slug) : undefined;
 
@@ -113,9 +116,34 @@ export default function Category() {
     return filteredAndSortedTools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [filteredAndSortedTools, currentPage]);
 
-  // Reset to page 1 when filters change
+  // Infinite scroll
+  const infiniteTools = useMemo(() => {
+    return filteredAndSortedTools.slice(0, displayedCount);
+  }, [filteredAndSortedTools, displayedCount]);
+
+  const hasMore = displayedCount < filteredAndSortedTools.length;
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+    // Simulate slight delay for smoother UX
+    setTimeout(() => {
+      setDisplayedCount((prev) => Math.min(prev + ITEMS_PER_PAGE, filteredAndSortedTools.length));
+      setIsLoadingMore(false);
+    }, 300);
+  }, [isLoadingMore, hasMore, filteredAndSortedTools.length]);
+
+  const { loadMoreRef } = useInfiniteScroll({
+    onLoadMore: loadMore,
+    hasMore,
+    isLoading: isLoadingMore,
+  });
+
+  // Reset to page 1 and displayed count when filters change
   useEffect(() => {
     setCurrentPage(1);
+    setDisplayedCount(ITEMS_PER_PAGE);
   }, [searchQuery, sortBy]);
 
   const allCategories = getAllCategories();
@@ -281,6 +309,33 @@ export default function Category() {
                     <SelectItem value="newest">Newest First</SelectItem>
                   </SelectContent>
                 </Select>
+                {/* View Mode Toggle */}
+                <div className="flex border rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setViewMode("pagination")}
+                    className={`px-3 py-2 flex items-center gap-1 text-sm transition-colors ${
+                      viewMode === "pagination"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background hover:bg-muted"
+                    }`}
+                    title="Pagination"
+                  >
+                    <List className="h-4 w-4" />
+                    <span className="hidden sm:inline">Pages</span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode("infinite")}
+                    className={`px-3 py-2 flex items-center gap-1 text-sm transition-colors ${
+                      viewMode === "infinite"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-background hover:bg-muted"
+                    }`}
+                    title="Infinite Scroll"
+                  >
+                    <Infinity className="h-4 w-4" />
+                    <span className="hidden sm:inline">Scroll</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -289,7 +344,7 @@ export default function Category() {
             <div className="flex justify-center items-center min-h-[300px]">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : (
+          ) : viewMode === "pagination" ? (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {paginatedTools.map((tool, index) => (
@@ -356,6 +411,31 @@ export default function Category() {
                   </Pagination>
                 </div>
               )}
+            </>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {infiniteTools.map((tool, index) => (
+                  <motion.div
+                    key={tool.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                  >
+                    <ToolCard tool={tool} />
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Infinite scroll trigger */}
+              <div ref={loadMoreRef} className="h-20 flex items-center justify-center">
+                {isLoadingMore && (
+                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                )}
+                {!hasMore && infiniteTools.length > 0 && (
+                  <p className="text-muted-foreground text-sm">You've seen all {filteredAndSortedTools.length} tools</p>
+                )}
+              </div>
             </>
           )}
 
