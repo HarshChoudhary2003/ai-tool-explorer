@@ -37,7 +37,10 @@ export default function Category() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("popularity");
   const [currentPage, setCurrentPage] = useState(1);
-  const [viewMode, setViewMode] = useState<"pagination" | "infinite">("pagination");
+  const [viewMode, setViewMode] = useState<"pagination" | "infinite">(() => {
+    const saved = localStorage.getItem("categoryViewMode");
+    return saved === "infinite" ? "infinite" : "pagination";
+  });
   const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_PAGE);
 
   const categoryInfo = slug ? getCategoryBySlug(slug) : undefined;
@@ -139,6 +142,11 @@ export default function Category() {
     hasMore,
     isLoading: isLoadingMore,
   });
+
+  // Persist view mode preference
+  useEffect(() => {
+    localStorage.setItem("categoryViewMode", viewMode);
+  }, [viewMode]);
 
   // Reset to page 1 and displayed count when filters change
   useEffect(() => {
