@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
+import { ToolCardSkeletonGrid } from "@/components/ToolCardSkeleton";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Testimonials } from "@/components/Testimonials";
@@ -16,8 +17,12 @@ import { NewThisWeek } from "@/components/NewThisWeek";
 import { CategoryGrid } from "@/components/CategoryGrid";
 import { MostReviewed } from "@/components/MostReviewed";
 import { HighestRated } from "@/components/HighestRated";
+import { HomepageFilterChips } from "@/components/HomepageFilterChips";
 import { motion } from "framer-motion";
 import { useAnimatedCounter } from "@/hooks/useAnimatedCounter";
+import { Database } from "@/integrations/supabase/types";
+
+type ToolCategory = Database["public"]["Enums"]["tool_category"];
 
 interface CategoryCount {
   category: string;
@@ -29,16 +34,21 @@ export default function Index() {
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [trendingTools, setTrendingTools] = useState<any[]>([]);
+  const [trendingLoading, setTrendingLoading] = useState(true);
   const [toolCount, setToolCount] = useState<number>(0);
   const [categoryCounts, setCategoryCounts] = useState<CategoryCount[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   
   const { count: animatedCount } = useAnimatedCounter(toolCount, 2000);
 
   useEffect(() => {
-    fetchTrendingTools();
     fetchToolCount();
     fetchCategoryCounts();
   }, []);
+
+  useEffect(() => {
+    fetchTrendingTools();
+  }, [categoryFilter]);
 
   // Scroll to hash on navigation
   useEffect(() => {
@@ -81,13 +91,21 @@ export default function Index() {
   };
 
   const fetchTrendingTools = async () => {
-    const { data } = await supabase
+    setTrendingLoading(true);
+    let query = supabase
       .from("ai_tools")
       .select("*")
       .order("popularity_score", { ascending: false })
       .limit(6);
 
+    if (categoryFilter) {
+      query = query.eq("category", categoryFilter as ToolCategory);
+    }
+
+    const { data } = await query;
+
     if (data) setTrendingTools(data);
+    setTrendingLoading(false);
   };
 
   const handleSearch = () => {
@@ -302,29 +320,50 @@ export default function Index() {
       {/* Category Grid */}
       <CategoryGrid />
 
+      {/* Filter Chips for Tool Sections */}
+      <HomepageFilterChips 
+        selectedCategory={categoryFilter} 
+        onCategoryChange={setCategoryFilter} 
+      />
+
       {/* Featured Tools Section */}
-      <FeaturedTools />
+      <FeaturedTools categoryFilter={categoryFilter} />
 
       {/* New This Week */}
-      <NewThisWeek />
+      <NewThisWeek categoryFilter={categoryFilter} />
 
       {/* Most Reviewed */}
-      <MostReviewed />
+      <MostReviewed categoryFilter={categoryFilter} />
 
       {/* Highest Rated */}
-      <HighestRated />
+      <HighestRated categoryFilter={categoryFilter} />
 
       {/* Trending Tools */}
       <section className="container mx-auto px-4 py-12 sm:py-16">
-        <div className="flex items-center gap-3 mb-6 sm:mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center gap-3 mb-6 sm:mb-8"
+        >
           <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Trending AI Tools</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-          {trendingTools.map((tool) => (
-            <ToolCard key={tool.id} tool={tool} />
-          ))}
-        </div>
+        </motion.div>
+        
+        {trendingLoading ? (
+          <ToolCardSkeletonGrid count={6} />
+        ) : trendingTools.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            No trending tools found{categoryFilter ? " in this category" : ""}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {trendingTools.map((tool) => (
+              <ToolCard key={tool.id} tool={tool} />
+            ))}
+          </div>
+        )}
         <div className="text-center mt-6 sm:mt-8">
           <Button asChild size="lg" variant="outline" className="glass">
             <Link to="/tools">View All Tools</Link>
