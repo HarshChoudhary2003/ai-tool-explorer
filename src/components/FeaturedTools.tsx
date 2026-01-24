@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
+import { ToolCardSkeletonGrid } from "@/components/ToolCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, ArrowRight, Star } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+
+type ToolCategory = Database["public"]["Enums"]["tool_category"];
 import { motion } from "framer-motion";
 
 interface FeaturedTool {
@@ -21,21 +25,22 @@ interface FeaturedTool {
   created_at: string;
 }
 
-export function FeaturedTools() {
+interface FeaturedToolsProps {
+  categoryFilter?: string | null;
+}
+
+export function FeaturedTools({ categoryFilter }: FeaturedToolsProps) {
   const [featuredTools, setFeaturedTools] = useState<FeaturedTool[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchFeaturedTools();
-  }, []);
+  }, [categoryFilter]);
 
   const fetchFeaturedTools = async () => {
+    setLoading(true);
     try {
-      // Get tools added in the last 30 days with high ratings, ordered by popularity
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      const { data, error } = await supabase
+      let query = supabase
         .from("ai_tools")
         .select("*")
         .gte("rating", 4.3)
@@ -43,16 +48,20 @@ export function FeaturedTools() {
         .order("popularity_score", { ascending: false })
         .limit(6);
 
+      if (categoryFilter) {
+        query = query.eq("category", categoryFilter as ToolCategory);
+      }
+
+      const { data, error } = await query;
+
       if (error) throw error;
-      if (data) setFeaturedTools(data);
+      setFeaturedTools(data || []);
     } catch (error) {
       console.error("Error fetching featured tools:", error);
     } finally {
       setLoading(false);
     }
   };
-
-  if (loading || featuredTools.length === 0) return null;
 
   return (
     <section className="container mx-auto px-4 py-12 sm:py-16">
@@ -75,29 +84,37 @@ export function FeaturedTools() {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {featuredTools.map((tool, index) => (
-          <motion.div
-            key={tool.id}
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-          >
-            <div className="relative">
-              {index < 3 && (
-                <div className="absolute -top-2 -right-2 z-10">
-                  <Badge className="bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    Top Pick
-                  </Badge>
-                </div>
-              )}
-              <ToolCard tool={tool} />
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      {loading ? (
+        <ToolCardSkeletonGrid count={6} />
+      ) : featuredTools.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          No featured tools found{categoryFilter ? " in this category" : ""}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {featuredTools.map((tool, index) => (
+            <motion.div
+              key={tool.id}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+            >
+              <div className="relative">
+                {index < 3 && (
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <Badge className="bg-gradient-to-r from-primary to-secondary text-primary-foreground shadow-lg">
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Top Pick
+                    </Badge>
+                  </div>
+                )}
+                <ToolCard tool={tool} />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

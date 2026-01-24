@@ -2,8 +2,12 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
+import { ToolCardSkeletonGrid } from "@/components/ToolCardSkeleton";
 import { Button } from "@/components/ui/button";
-import { MessageSquare, Loader2 } from "lucide-react";
+import { MessageSquare } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+
+type ToolCategory = Database["public"]["Enums"]["tool_category"];
 import { motion } from "framer-motion";
 
 interface ToolWithReviewCount {
@@ -20,15 +24,20 @@ interface ToolWithReviewCount {
   review_count: number;
 }
 
-export function MostReviewed() {
+interface MostReviewedProps {
+  categoryFilter?: string | null;
+}
+
+export function MostReviewed({ categoryFilter }: MostReviewedProps) {
   const [tools, setTools] = useState<ToolWithReviewCount[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchMostReviewedTools();
-  }, []);
+  }, [categoryFilter]);
 
   const fetchMostReviewedTools = async () => {
+    setLoading(true);
     try {
       // Get review counts per tool
       const { data: reviewCounts, error: reviewError } = await supabase
@@ -50,19 +59,26 @@ export function MostReviewed() {
       // Get tool IDs sorted by review count
       const sortedToolIds = Object.entries(countMap)
         .sort(([, a], [, b]) => b - a)
-        .slice(0, 6)
+        .slice(0, 12)
         .map(([id]) => id);
 
       if (sortedToolIds.length === 0) {
+        setTools([]);
         setLoading(false);
         return;
       }
 
       // Fetch tool details
-      const { data: toolsData, error: toolsError } = await supabase
+      let query = supabase
         .from("ai_tools")
         .select("*")
         .in("id", sortedToolIds);
+
+      if (categoryFilter) {
+        query = query.eq("category", categoryFilter as ToolCategory);
+      }
+
+      const { data: toolsData, error: toolsError } = await query;
 
       if (toolsError) {
         console.error("Error fetching tools:", toolsError);
@@ -76,7 +92,8 @@ export function MostReviewed() {
           ...tool,
           review_count: countMap[tool.id] || 0,
         }))
-        .sort((a, b) => b.review_count - a.review_count);
+        .sort((a, b) => b.review_count - a.review_count)
+        .slice(0, 6);
 
       setTools(toolsWithCounts || []);
     } catch (error) {
@@ -85,24 +102,6 @@ export function MostReviewed() {
       setLoading(false);
     }
   };
-
-  if (loading) {
-    return (
-      <section className="container mx-auto px-4 py-12 sm:py-16">
-        <div className="flex items-center gap-3 mb-6 sm:mb-8">
-          <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Most Reviewed</h2>
-        </div>
-        <div className="flex justify-center items-center min-h-[200px]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </section>
-    );
-  }
-
-  if (tools.length === 0) {
-    return null;
-  }
 
   return (
     <section className="container mx-auto px-4 py-12 sm:py-16">
@@ -117,25 +116,33 @@ export function MostReviewed() {
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold">Most Reviewed</h2>
       </motion.div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {tools.map((tool, index) => (
-          <motion.div
-            key={tool.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: index * 0.1 }}
-          >
-            <div className="relative">
-              <ToolCard tool={tool} />
-              <div className="absolute top-3 right-3 bg-primary/90 text-primary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                <MessageSquare className="h-3 w-3" />
-                {tool.review_count} {tool.review_count === 1 ? "review" : "reviews"}
+      {loading ? (
+        <ToolCardSkeletonGrid count={6} />
+      ) : tools.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          No reviewed tools found{categoryFilter ? " in this category" : ""}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          {tools.map((tool, index) => (
+            <motion.div
+              key={tool.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+            >
+              <div className="relative">
+                <ToolCard tool={tool} />
+                <div className="absolute top-3 right-3 bg-primary/90 text-primary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                  <MessageSquare className="h-3 w-3" />
+                  {tool.review_count} {tool.review_count === 1 ? "review" : "reviews"}
+                </div>
               </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
       
       <div className="text-center mt-6 sm:mt-8">
         <Button asChild size="lg" variant="outline" className="glass">
