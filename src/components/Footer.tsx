@@ -43,7 +43,8 @@ const Footer = () => {
               <Link to="/compare" className="text-muted-foreground hover:text-primary transition-colors">Compare Tools</Link>
               <Link to="/recommend" className="text-muted-foreground hover:text-primary transition-colors">Get Recommendations</Link>
               <Link to="/blog" className="text-muted-foreground hover:text-primary transition-colors">Blog</Link>
-              <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link>
+              <Link to="/docs" className="text-muted-foreground hover:text-primary transition-colors">Documentation</Link>
+              <Link to="/changelog" className="text-muted-foreground hover:text-primary transition-colors">Changelog</Link>
             </nav>
           </div>
 
