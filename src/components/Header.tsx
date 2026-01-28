@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Menu, User, LogOut } from "lucide-react";
+import { Sparkles, Menu, User, LogOut, Search } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -12,9 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { GlobalSearch, GlobalSearchTrigger } from "@/components/GlobalSearch";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { user, signOut } = useAuth();
 
   const navLinks = [
@@ -58,6 +60,7 @@ const Header = () => {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
+            <GlobalSearchTrigger onClick={() => setSearchOpen(true)} />
             <ThemeToggle />
             {user ? (
               <DropdownMenu>
@@ -90,12 +93,16 @@ const Header = () => {
             )}
           </div>
 
-          <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-6 w-6" />
-              </Button>
-            </SheetTrigger>
+          <div className="flex md:hidden items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
+              <Search className="h-5 w-5" />
+            </Button>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="h-6 w-6" />
+                </Button>
+              </SheetTrigger>
             <SheetContent side="right" className="w-[280px] glass">
               <div className="flex flex-col gap-6 mt-8">
                 {navLinks.map((link) => (
@@ -136,6 +143,9 @@ const Header = () => {
               </div>
             </SheetContent>
           </Sheet>
+          </div>
+
+          <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
         </div>
       </div>
     </header>
