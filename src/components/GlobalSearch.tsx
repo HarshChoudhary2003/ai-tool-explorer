@@ -15,6 +15,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Badge } from "@/components/ui/badge";
 import {
   Search,
@@ -237,20 +238,46 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
         {tools.length > 0 && (
           <CommandGroup heading="Tools">
             {tools.map((tool) => (
-              <CommandItem
-                key={tool.id}
-                value={tool.name}
-                onSelect={() => handleSelect(`/tools/${tool.id}`, search)}
-                className="cursor-pointer"
-              >
-                <Sparkles className="mr-2 h-4 w-4 text-primary" />
-                <div className="flex flex-col flex-1">
-                  <span>{tool.name}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {formatCategory(tool.category)}
-                  </span>
-                </div>
-              </CommandItem>
+              <HoverCard key={tool.id} openDelay={300} closeDelay={100}>
+                <HoverCardTrigger asChild>
+                  <CommandItem
+                    value={tool.name}
+                    onSelect={() => handleSelect(`/tools/${tool.id}`, search)}
+                    className="cursor-pointer"
+                  >
+                    <Sparkles className="mr-2 h-4 w-4 text-primary" />
+                    <div className="flex flex-col flex-1">
+                      <span>{tool.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatCategory(tool.category)}
+                      </span>
+                    </div>
+                  </CommandItem>
+                </HoverCardTrigger>
+                <HoverCardContent 
+                  side="right" 
+                  align="start" 
+                  className="w-80 p-4"
+                  sideOffset={8}
+                >
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      <h4 className="font-semibold text-sm">{tool.name}</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      {tool.description.length > 150 
+                        ? tool.description.slice(0, 150) + "..." 
+                        : tool.description}
+                    </p>
+                    <div className="pt-1">
+                      <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
+                        {formatCategory(tool.category)}
+                      </span>
+                    </div>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
             ))}
           </CommandGroup>
         )}
