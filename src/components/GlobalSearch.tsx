@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import Fuse from "fuse.js";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { categoryData } from "@/data/categoryData";
@@ -72,30 +73,47 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   const [selectedCategory, setSelectedCategory] = useState<ToolCategory | null>(null);
   const { recentSearches, addSearch, removeSearch, clearSearches } = useRecentSearches();
 
-  const { data: tools = [] } = useQuery({
-    queryKey: ["global-search-tools", search, selectedCategory],
+  // Fetch all tools for fuzzy search (cached)
+  const { data: allTools = [] } = useQuery({
+    queryKey: ["global-search-all-tools"],
     queryFn: async () => {
-      if (!search.trim() && !selectedCategory) return [];
-      
-      let query = supabase
+      const { data, error } = await supabase
         .from("ai_tools")
         .select("id, name, category, description, pricing, rating");
-
-      if (search.trim()) {
-        query = query.ilike("name", `%${search}%`);
-      }
-
-      if (selectedCategory) {
-        query = query.eq("category", selectedCategory);
-      }
-
-      const { data, error } = await query.limit(8);
 
       if (error) throw error;
       return data || [];
     },
-    enabled: search.length > 1 || !!selectedCategory,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
+
+  // Fuse.js configuration for fuzzy search
+  const fuse = useMemo(() => {
+    return new Fuse(allTools, {
+      keys: ["name", "description"],
+      threshold: 0.4, // 0 = exact match, 1 = match anything
+      distance: 100,
+      includeScore: true,
+    });
+  }, [allTools]);
+
+  // Fuzzy search results
+  const tools = useMemo(() => {
+    let results = allTools;
+
+    // Apply fuzzy search if there's a search query
+    if (search.trim()) {
+      const fuseResults = fuse.search(search);
+      results = fuseResults.map((result) => result.item);
+    }
+
+    // Filter by category if selected
+    if (selectedCategory) {
+      results = results.filter((tool) => tool.category === selectedCategory);
+    }
+
+    return results.slice(0, 8);
+  }, [search, selectedCategory, fuse, allTools]);
 
   // Keyboard shortcut to open search
   useEffect(() => {
@@ -236,7 +254,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
         )}
 
         {/* Tool Results */}
-        {tools.length > 0 && (
+        {(search.trim() || selectedCategory) && tools.length > 0 && (
           <CommandGroup heading="Tools">
             {tools.map((tool) => (
               <HoverCard key={tool.id} openDelay={300} closeDelay={100}>
