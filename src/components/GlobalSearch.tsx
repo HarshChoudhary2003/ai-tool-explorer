@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Badge } from "@/components/ui/badge";
+import { RatingStars } from "@/components/RatingStars";
 import {
   Search,
   Sparkles,
@@ -78,7 +79,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       
       let query = supabase
         .from("ai_tools")
-        .select("id, name, category, description");
+        .select("id, name, category, description, pricing, rating");
 
       if (search.trim()) {
         query = query.ilike("name", `%${search}%`);
@@ -270,7 +271,16 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                         ? tool.description.slice(0, 150) + "..." 
                         : tool.description}
                     </p>
-                    <div className="pt-1">
+                    <div className="flex items-center gap-2 pt-1">
+                      <RatingStars rating={tool.rating || 0} size="sm" />
+                      <span className="text-xs text-muted-foreground">
+                        {tool.rating?.toFixed(1) || "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
+                      <Badge variant="outline" className="text-xs capitalize">
+                        {tool.pricing}
+                      </Badge>
                       <span className="text-xs bg-muted px-2 py-0.5 rounded-full">
                         {formatCategory(tool.category)}
                       </span>
