@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import Fuse from "fuse.js";
+import Fuse, { FuseResultMatch } from "fuse.js";
 import { supabase } from "@/integrations/supabase/client";
 import { useRecentSearches } from "@/hooks/useRecentSearches";
 import { categoryData } from "@/data/categoryData";
@@ -94,26 +94,65 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       threshold: 0.4, // 0 = exact match, 1 = match anything
       distance: 100,
       includeScore: true,
+      includeMatches: true, // Enable match info for highlighting
     });
   }, [allTools]);
 
-  // Fuzzy search results
-  const tools = useMemo(() => {
-    let results = allTools;
+  // Fuzzy search results with match info
+  const toolsWithMatches = useMemo(() => {
+    let results: { item: typeof allTools[0]; matches?: readonly FuseResultMatch[] }[] = [];
 
     // Apply fuzzy search if there's a search query
     if (search.trim()) {
       const fuseResults = fuse.search(search);
-      results = fuseResults.map((result) => result.item);
+      results = fuseResults.map((result) => ({
+        item: result.item,
+        matches: result.matches,
+      }));
+    } else {
+      results = allTools.map((item) => ({ item, matches: undefined }));
     }
 
     // Filter by category if selected
     if (selectedCategory) {
-      results = results.filter((tool) => tool.category === selectedCategory);
+      results = results.filter((r) => r.item.category === selectedCategory);
     }
 
     return results.slice(0, 8);
   }, [search, selectedCategory, fuse, allTools]);
+
+  // Helper function to highlight matched text
+  const highlightMatch = (text: string, matches: readonly FuseResultMatch[] | undefined, key: string) => {
+    if (!matches || !search.trim()) return text;
+
+    const match = matches.find((m) => m.key === key);
+    if (!match || !match.indices.length) return text;
+
+    const indices = [...match.indices].sort((a, b) => a[0] - b[0]);
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+
+    indices.forEach(([start, end], i) => {
+      // Add non-matched text before this match
+      if (start > lastIndex) {
+        parts.push(text.slice(lastIndex, start));
+      }
+      // Add highlighted matched text
+      parts.push(
+        <span key={i} className="text-searchHighlight bg-searchHighlight-bg/20 font-semibold px-0.5 rounded-sm">
+          {text.slice(start, end + 1)}
+        </span>
+      );
+      lastIndex = end + 1;
+    });
+
+    // Add remaining non-matched text
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return <>{parts}</>;
+  };
 
   // Keyboard shortcut to open search
   useEffect(() => {
@@ -254,9 +293,9 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
         )}
 
         {/* Tool Results */}
-        {(search.trim() || selectedCategory) && tools.length > 0 && (
+        {(search.trim() || selectedCategory) && toolsWithMatches.length > 0 && (
           <CommandGroup heading="Tools">
-            {tools.map((tool) => (
+            {toolsWithMatches.map(({ item: tool, matches }) => (
               <HoverCard key={tool.id} openDelay={300} closeDelay={100}>
                 <HoverCardTrigger asChild>
                   <CommandItem
@@ -266,7 +305,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                   >
                     <Sparkles className="mr-2 h-4 w-4 text-primary" />
                     <div className="flex flex-col flex-1">
-                      <span>{tool.name}</span>
+                      <span>{highlightMatch(tool.name, matches, "name")}</span>
                       <span className="text-xs text-muted-foreground">
                         {formatCategory(tool.category)}
                       </span>
