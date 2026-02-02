@@ -60,6 +60,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        searchHighlight: {
+          DEFAULT: "hsl(var(--search-highlight))",
+          bg: "hsl(var(--search-highlight-bg))",
+        },
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
