@@ -139,7 +139,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
       }
       // Add highlighted matched text
       parts.push(
-        <span key={i} className="text-searchHighlight bg-searchHighlight-bg/20 font-semibold px-0.5 rounded-sm">
+        <span key={i} className="text-searchHighlight bg-searchHighlight-bg/40 font-semibold px-0.5 rounded-sm">
           {text.slice(start, end + 1)}
         </span>
       );
