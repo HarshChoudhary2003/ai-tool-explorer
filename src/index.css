@@ -47,9 +47,9 @@ All colors MUST be HSL.
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-    /* Search highlight colors */
-    --search-highlight: 189 100% 50%;
-    --search-highlight-bg: 189 100% 50%;
+    /* Search highlight colors - vibrant gold/amber for dark mode */
+    --search-highlight: 45 100% 60%;
+    --search-highlight-bg: 45 100% 50%;
 
     --sidebar-background: 220 20% 10%;
     --sidebar-foreground: 210 40% 98%;
@@ -136,9 +136,9 @@ All colors MUST be HSL.
     --shadow-glow: 0 0 40px hsla(189, 85%, 35%, 0.2);
     --shadow-card: 0 10px 30px -10px hsla(220, 25%, 15%, 0.12);
 
-    /* Search highlight colors */
-    --search-highlight: 189 85% 30%;
-    --search-highlight-bg: 189 85% 35%;
+    /* Search highlight colors - warm orange for light mode */
+    --search-highlight: 25 95% 45%;
+    --search-highlight-bg: 45 100% 70%;
 
     --sidebar-background: 220 20% 97%;
     --sidebar-foreground: 220 25% 15%;
