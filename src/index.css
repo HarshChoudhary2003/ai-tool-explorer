@@ -8,44 +8,50 @@ All colors MUST be HSL.
 
 @layer base {
 :root {
-    --background: 220 25% 8%;
+    --background: 230 35% 6%;
     --foreground: 210 40% 98%;
 
-    --card: 220 20% 12%;
+    --card: 230 28% 10%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 220 20% 12%;
+    --popover: 230 28% 10%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 189 100% 50%;
-    --primary-foreground: 220 25% 8%;
+    --primary: 199 100% 55%;
+    --primary-foreground: 230 35% 6%;
+    --primary-glow: 199 100% 70%;
 
-    --secondary: 280 60% 55%;
+    --secondary: 270 85% 65%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 220 15% 20%;
-    --muted-foreground: 210 20% 75%;
+    --muted: 230 20% 18%;
+    --muted-foreground: 215 20% 72%;
 
-    --accent: 320 80% 60%;
+    --accent: 330 90% 65%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 15% 28%;
-    --input: 220 15% 22%;
-    --ring: 189 100% 50%;
+    --border: 230 20% 22%;
+    --input: 230 20% 18%;
+    --ring: 199 100% 55%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(189, 100%, 50%), hsl(280, 60%, 55%));
-    --gradient-secondary: linear-gradient(180deg, hsl(220, 25%, 8%), hsl(220, 20%, 12%));
-    --gradient-hero: linear-gradient(135deg, hsl(189, 100%, 50%) 0%, hsl(280, 60%, 55%) 50%, hsl(320, 80%, 60%) 100%);
-    
-    --shadow-glow: 0 0 40px hsla(189, 100%, 50%, 0.3);
-    --shadow-card: 0 10px 30px -10px hsla(189, 100%, 50%, 0.2);
+    --gradient-primary: linear-gradient(135deg, hsl(199 100% 55%), hsl(270 85% 65%));
+    --gradient-secondary: linear-gradient(180deg, hsl(230 35% 6%), hsl(230 30% 9%));
+    --gradient-hero: linear-gradient(135deg, hsl(199 100% 55%) 0%, hsl(270 85% 65%) 50%, hsl(330 90% 65%) 100%);
+    --gradient-mesh: radial-gradient(at 20% 20%, hsl(199 100% 55% / 0.25) 0px, transparent 50%),
+                     radial-gradient(at 80% 10%, hsl(270 85% 65% / 0.22) 0px, transparent 50%),
+                     radial-gradient(at 70% 80%, hsl(330 90% 65% / 0.20) 0px, transparent 50%);
+
+    --shadow-glow: 0 0 60px hsl(199 100% 55% / 0.35);
+    --shadow-card: 0 20px 50px -20px hsl(199 100% 55% / 0.25);
+    --shadow-elegant: 0 25px 50px -12px hsl(230 35% 3% / 0.6);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 
     /* Search highlight colors - vibrant gold/amber for dark mode */
     --search-highlight: 45 100% 60%;
@@ -101,40 +107,45 @@ All colors MUST be HSL.
   }
 
   .light {
-    --background: 0 0% 100%;
-    --foreground: 220 25% 15%;
+    --background: 220 30% 99%;
+    --foreground: 230 30% 12%;
 
-    --card: 220 20% 97%;
-    --card-foreground: 220 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 230 30% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 15%;
+    --popover-foreground: 230 30% 12%;
 
-    --primary: 189 85% 35%;
+    --primary: 199 95% 40%;
     --primary-foreground: 0 0% 100%;
+    --primary-glow: 199 100% 60%;
 
-    --secondary: 280 55% 45%;
+    --secondary: 270 75% 55%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 220 15% 92%;
-    --muted-foreground: 220 15% 35%;
+    --muted: 220 20% 95%;
+    --muted-foreground: 230 15% 38%;
 
-    --accent: 320 75% 50%;
+    --accent: 330 85% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 80%;
-    --input: 220 15% 88%;
-    --ring: 189 85% 35%;
+    --border: 220 18% 88%;
+    --input: 220 18% 92%;
+    --ring: 199 95% 40%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(189, 85%, 35%), hsl(280, 55%, 45%));
-    --gradient-secondary: linear-gradient(180deg, hsl(0, 0%, 100%), hsl(220, 15%, 96%));
-    --gradient-hero: linear-gradient(135deg, hsl(189, 85%, 35%) 0%, hsl(280, 55%, 45%) 50%, hsl(320, 75%, 50%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(199 95% 40%), hsl(270 75% 55%));
+    --gradient-secondary: linear-gradient(180deg, hsl(220 30% 99%), hsl(220 25% 96%));
+    --gradient-hero: linear-gradient(135deg, hsl(199 95% 40%) 0%, hsl(270 75% 55%) 50%, hsl(330 85% 58%) 100%);
+    --gradient-mesh: radial-gradient(at 20% 20%, hsl(199 95% 40% / 0.15) 0px, transparent 50%),
+                     radial-gradient(at 80% 10%, hsl(270 75% 55% / 0.13) 0px, transparent 50%),
+                     radial-gradient(at 70% 80%, hsl(330 85% 58% / 0.12) 0px, transparent 50%);
 
-    --shadow-glow: 0 0 40px hsla(189, 85%, 35%, 0.2);
-    --shadow-card: 0 10px 30px -10px hsla(220, 25%, 15%, 0.12);
+    --shadow-glow: 0 0 60px hsl(199 95% 40% / 0.18);
+    --shadow-card: 0 20px 50px -20px hsl(230 30% 12% / 0.15);
+    --shadow-elegant: 0 25px 50px -12px hsl(230 30% 12% / 0.12);
 
     /* Search highlight colors - warm orange for light mode */
     --search-highlight: 25 95% 45%;
@@ -191,10 +202,12 @@ All colors MUST be HSL.
   .gradient-text {
     @apply bg-clip-text text-transparent;
     background-image: var(--gradient-hero);
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
   }
   
   .glass {
-    @apply backdrop-blur-xl bg-card/50 border border-border/50;
+    @apply backdrop-blur-xl bg-card/60 border border-border/50;
   }
   
   .glow {
@@ -203,6 +216,31 @@ All colors MUST be HSL.
   
   .card-shadow {
     box-shadow: var(--shadow-card);
+  }
+
+  .elegant-shadow {
+    box-shadow: var(--shadow-elegant);
+  }
+
+  .mesh-bg {
+    background-image: var(--gradient-mesh);
+  }
+
+  .hover-lift {
+    transition: var(--transition-bounce);
+  }
+  .hover-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-card);
+  }
+
+  .shimmer-text {
+    background: linear-gradient(110deg, hsl(var(--foreground)) 30%, hsl(var(--primary)) 50%, hsl(var(--foreground)) 70%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 3s linear infinite;
   }
 
   .search-highlight {
