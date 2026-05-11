@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ToolCard } from "@/components/ToolCard";
 import { ToolCardSkeleton } from "@/components/ToolCardSkeleton";
 import { FilterBar } from "@/components/FilterBar";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
-import { Sparkles, SearchX } from "lucide-react";
+import { Sparkles, SearchX, GitCompare, X, ArrowRight } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -19,11 +19,13 @@ import {
 import { Button } from "@/components/ui/button";
 
 const PAGE_SIZE = 12;
+const MAX_COMPARE = 3;
 
 export default function Tools() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tools, setTools] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [compareTools, setCompareTools] = useState<any[]>([]);
 
   const category = searchParams.get("category");
   const search = searchParams.get("search");
@@ -39,7 +41,6 @@ export default function Tools() {
   }, []);
 
   const fetchTools = async () => {
-    setLoading(true);
     const { data, error } = await supabase
       .from("ai_tools")
       .select("*")
@@ -52,6 +53,19 @@ export default function Tools() {
     }
     setLoading(false);
   };
+
+  const isInitialLoading = loading && tools.length === 0;
+
+  const toggleCompare = (tool: any) => {
+    setCompareTools((prev) => {
+      if (prev.find((t) => t.id === tool.id)) {
+        return prev.filter((t) => t.id !== tool.id);
+      }
+      if (prev.length >= MAX_COMPARE) return prev;
+      return [...prev, tool];
+    });
+  };
+  const compareIds = compareTools.map((t) => t.id);
 
   const filteredTools = useMemo(() => {
     let filtered = [...tools];
@@ -185,7 +199,7 @@ export default function Tools() {
           <FilterBar totalCount={filteredTools.length} />
         </div>
 
-        {loading ? (
+        {isInitialLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <ToolCardSkeleton key={i} />
@@ -213,7 +227,12 @@ export default function Tools() {
                   className="animate-fade-in"
                   style={{ animationDelay: `${Math.min(index * 50, 400)}ms`, animationFillMode: "backwards" }}
                 >
-                  <ToolCard tool={tool} />
+                  <ToolCard
+                    tool={tool}
+                    compareSelected={compareIds.includes(tool.id)}
+                    compareDisabled={compareTools.length >= MAX_COMPARE}
+                    onToggleCompare={toggleCompare}
+                  />
                 </div>
               ))}
             </div>
@@ -285,6 +304,56 @@ export default function Tools() {
           </>
         )}
       </main>
+
+      {/* Floating compare bar */}
+      {compareTools.length > 0 && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-3xl px-3 sm:px-0 animate-fade-in">
+          <div className="glass shadow-card rounded-2xl p-3 sm:p-4 flex items-center gap-3 border border-primary/30">
+            <div className="hidden sm:flex h-9 w-9 rounded-xl bg-primary/15 items-center justify-center shrink-0">
+              <GitCompare className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm font-semibold mb-1">
+                Comparing {compareTools.length} of {MAX_COMPARE}
+              </p>
+              <div className="flex gap-1.5 flex-wrap">
+                {compareTools.map((t) => (
+                  <span
+                    key={t.id}
+                    className="inline-flex items-center gap-1 text-[11px] sm:text-xs bg-muted/70 rounded-full pl-2 pr-1 py-0.5"
+                  >
+                    <span className="truncate max-w-[100px] sm:max-w-[160px]">{t.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => toggleCompare(t)}
+                      className="rounded-full hover:bg-background p-0.5"
+                      aria-label={`Remove ${t.name}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setCompareTools([])}
+                className="hidden sm:inline-flex"
+              >
+                Clear
+              </Button>
+              <Button asChild size="sm" disabled={compareTools.length < 2}>
+                <Link to={`/compare?tools=${compareIds.join(",")}`}>
+                  Compare
+                  <ArrowRight className="h-4 w-4 ml-1" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

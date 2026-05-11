@@ -1,14 +1,18 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Star, Zap, ArrowUpRight } from "lucide-react";
+import { ExternalLink, Star, Zap, ArrowUpRight, GitCompare, Check } from "lucide-react";
 import { BookmarkButton } from "@/components/BookmarkButton";
+import { cn } from "@/lib/utils";
 
 interface ToolCardProps {
   tool: any;
+  compareSelected?: boolean;
+  onToggleCompare?: (tool: any) => void;
+  compareDisabled?: boolean;
 }
 
-export function ToolCard({ tool }: ToolCardProps) {
+export function ToolCard({ tool, compareSelected, onToggleCompare, compareDisabled }: ToolCardProps) {
   const formatCategory = (cat: string) => {
     return cat
       .split("_")
@@ -19,9 +23,21 @@ export function ToolCard({ tool }: ToolCardProps) {
   return (
     <div className="group relative h-full">
       {/* Animated gradient border on hover */}
-      <div className="absolute -inset-px rounded-2xl bg-gradient-to-br from-primary/0 via-secondary/0 to-accent/0 group-hover:from-primary/60 group-hover:via-secondary/60 group-hover:to-accent/60 transition-all duration-500 opacity-0 group-hover:opacity-100 blur-sm" />
+      <div
+        className={cn(
+          "absolute -inset-px rounded-2xl bg-gradient-to-br transition-all duration-500 blur-sm",
+          compareSelected
+            ? "from-primary/70 via-secondary/70 to-accent/70 opacity-100"
+            : "from-primary/0 via-secondary/0 to-accent/0 opacity-0 group-hover:from-primary/60 group-hover:via-secondary/60 group-hover:to-accent/60 group-hover:opacity-100"
+        )}
+      />
 
-      <div className="relative flex flex-col h-full glass rounded-2xl p-5 sm:p-6 hover-lift overflow-hidden">
+      <div
+        className={cn(
+          "relative flex flex-col h-full glass rounded-2xl p-5 sm:p-6 hover-lift overflow-hidden",
+          compareSelected && "ring-2 ring-primary/60"
+        )}
+      >
         {/* Decorative gradient blob */}
         <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-gradient-primary opacity-10 blur-3xl group-hover:opacity-30 transition-opacity duration-500" />
 
@@ -91,6 +107,27 @@ export function ToolCard({ tool }: ToolCardProps) {
               <ArrowUpRight className="h-4 w-4 ml-1 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
             </Link>
           </Button>
+          {onToggleCompare && (
+            <Button
+              type="button"
+              variant={compareSelected ? "default" : "outline"}
+              size="icon"
+              className="shrink-0"
+              onClick={() => onToggleCompare(tool)}
+              disabled={!compareSelected && compareDisabled}
+              aria-pressed={compareSelected}
+              aria-label={compareSelected ? `Remove ${tool.name} from compare` : `Add ${tool.name} to compare`}
+              title={
+                !compareSelected && compareDisabled
+                  ? "You can compare up to 3 tools"
+                  : compareSelected
+                  ? "Remove from compare"
+                  : "Add to compare"
+              }
+            >
+              {compareSelected ? <Check className="h-4 w-4" /> : <GitCompare className="h-4 w-4" />}
+            </Button>
+          )}
           <Button asChild variant="outline" size="icon" className="shrink-0">
             <a href={tool.website_url} target="_blank" rel="noopener noreferrer" aria-label={`Visit ${tool.name}`}>
               <ExternalLink className="h-4 w-4" />
