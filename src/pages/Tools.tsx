@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 const PAGE_SIZE = 12;
 
 export default function Tools() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tools, setTools] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
