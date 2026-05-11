@@ -1,137 +1,122 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Search, X, SlidersHorizontal } from "lucide-react";
+import { Search, X, SlidersHorizontal, Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+  SheetClose,
+} from "@/components/ui/sheet";
 
 interface FilterBarProps {
   totalCount: number;
 }
 
+const categories = [
+  { value: "all", label: "All Categories" },
+  { value: "llm", label: "LLMs" },
+  { value: "image_generation", label: "Image Generation" },
+  { value: "voice", label: "Voice & Audio" },
+  { value: "audio", label: "Audio & Music" },
+  { value: "automation", label: "Automation" },
+  { value: "no_code", label: "No-Code" },
+  { value: "video", label: "Video" },
+  { value: "productivity", label: "Productivity" },
+  { value: "code_assistant", label: "Code Assistants" },
+  { value: "data_analysis", label: "Data Analysis" },
+];
+
+const pricingOptions = [
+  { value: "all", label: "All Pricing" },
+  { value: "free", label: "Free" },
+  { value: "freemium", label: "Freemium" },
+  { value: "paid", label: "Paid" },
+  { value: "enterprise", label: "Enterprise" },
+];
+
+const ratingOptions = [
+  { value: "all", label: "All Ratings" },
+  { value: "4.5", label: "4.5+ Stars" },
+  { value: "4", label: "4+ Stars" },
+  { value: "3.5", label: "3.5+ Stars" },
+  { value: "3", label: "3+ Stars" },
+];
+
+const sortOptions = [
+  { value: "popularity", label: "Most Popular" },
+  { value: "rating", label: "Highest Rated" },
+  { value: "name", label: "Name A-Z" },
+  { value: "newest", label: "Newest First" },
+];
+
 export function FilterBar({ totalCount }: FilterBarProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const categories = [
-    { value: "all", label: "All Categories" },
-    { value: "llm", label: "LLMs" },
-    { value: "image_generation", label: "Image Generation" },
-    { value: "voice", label: "Voice & Audio" },
-    { value: "audio", label: "Audio & Music" },
-    { value: "automation", label: "Automation" },
-    { value: "no_code", label: "No-Code" },
-    { value: "video", label: "Video" },
-    { value: "productivity", label: "Productivity" },
-    { value: "code_assistant", label: "Code Assistants" },
-    { value: "data_analysis", label: "Data Analysis" },
-  ];
+  // Keep local search input synced when URL changes (back/forward, reset)
+  useEffect(() => {
+    setSearchInput(searchParams.get("search") || "");
+  }, [searchParams]);
 
-  const pricingOptions = [
-    { value: "all", label: "All Pricing" },
-    { value: "free", label: "Free" },
-    { value: "freemium", label: "Freemium" },
-    { value: "paid", label: "Paid" },
-    { value: "enterprise", label: "Enterprise" },
-  ];
-
-  const ratingOptions = [
-    { value: "all", label: "All Ratings" },
-    { value: "4.5", label: "4.5+ Stars" },
-    { value: "4", label: "4+ Stars" },
-    { value: "3.5", label: "3.5+ Stars" },
-    { value: "3", label: "3+ Stars" },
-  ];
-
-  const sortOptions = [
-    { value: "popularity", label: "Most Popular" },
-    { value: "rating", label: "Highest Rated" },
-    { value: "name", label: "Name A-Z" },
-    { value: "newest", label: "Newest First" },
-  ];
-
-  const handleSearch = () => {
-    if (searchInput.trim()) {
-      searchParams.set("search", searchInput.trim());
+  // Reset page=1 on any filter mutation
+  const updateParam = (key: string, value: string | null) => {
+    const params = new URLSearchParams(searchParams);
+    if (value === null || value === "" || value === "all") {
+      params.delete(key);
     } else {
-      searchParams.delete("search");
+      params.set(key, value);
     }
-    setSearchParams(searchParams);
+    params.delete("page");
+    setSearchParams(params);
   };
 
-  const handleCategoryChange = (value: string) => {
-    if (value === "all") {
-      searchParams.delete("category");
-    } else {
-      searchParams.set("category", value);
-    }
-    setSearchParams(searchParams);
-  };
+  // Debounced live search synced to URL
+  useEffect(() => {
+    const current = searchParams.get("search") || "";
+    if (searchInput === current) return;
+    const t = setTimeout(() => updateParam("search", searchInput.trim() || null), 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput]);
 
-  const handlePricingChange = (value: string) => {
-    if (value === "all") {
-      searchParams.delete("pricing");
-    } else {
-      searchParams.set("pricing", value);
-    }
-    setSearchParams(searchParams);
-  };
-
-  const handleRatingChange = (value: string) => {
-    if (value === "all") {
-      searchParams.delete("rating");
-    } else {
-      searchParams.set("rating", value);
-    }
-    setSearchParams(searchParams);
-  };
-
-  const handleSortChange = (value: string) => {
-    if (value === "popularity") {
-      searchParams.delete("sort");
-    } else {
-      searchParams.set("sort", value);
-    }
-    setSearchParams(searchParams);
-  };
-
-  const handleApiToggle = (checked: boolean) => {
-    if (checked) {
-      searchParams.set("hasApi", "true");
-    } else {
-      searchParams.delete("hasApi");
-    }
-    setSearchParams(searchParams);
-  };
+  const handleApiToggle = (checked: boolean) => updateParam("hasApi", checked ? "true" : null);
 
   const clearFilters = () => {
     setSearchInput("");
     setSearchParams({});
   };
 
-  const activeFilters = Array.from(searchParams.keys()).filter(
-    (key) => key !== "search"
+  const activeFilterKeys = Array.from(searchParams.keys()).filter(
+    (key) => key !== "search" && key !== "page"
   );
+  const activeFilterCount = activeFilterKeys.length + (searchParams.get("search") ? 1 : 0);
 
   const getFilterLabel = (key: string, value: string): string => {
     switch (key) {
       case "category":
-        return categories.find(c => c.value === value)?.label || value;
+        return categories.find((c) => c.value === value)?.label || value;
       case "pricing":
-        return pricingOptions.find(p => p.value === value)?.label || value;
+        return pricingOptions.find((p) => p.value === value)?.label || value;
       case "rating":
         return `${value}+ Stars`;
       case "sort":
-        return sortOptions.find(s => s.value === value)?.label || value;
+        return sortOptions.find((s) => s.value === value)?.label || value;
       case "hasApi":
         return "Has API";
       default:
@@ -139,140 +124,199 @@ export function FilterBar({ totalCount }: FilterBarProps) {
     }
   };
 
-  return (
-    <div className="glass p-4 sm:p-6 rounded-xl mb-8 space-y-4">
-      {/* Main search and filters row */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1 flex gap-2">
-          <Input
-            placeholder="Search AI tools by name, description, or task..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="flex-1"
-          />
-          <Button onClick={handleSearch} size="icon">
-            <Search className="h-4 w-4" />
-          </Button>
-        </div>
+  const FilterControls = ({ stacked = false }: { stacked?: boolean }) => (
+    <div className={stacked ? "space-y-4" : "flex gap-2 flex-wrap lg:flex-nowrap"}>
+      <Select
+        value={searchParams.get("category") || "all"}
+        onValueChange={(v) => updateParam("category", v)}
+      >
+        <SelectTrigger className={stacked ? "w-full" : "w-full lg:w-[170px]"}>
+          <SelectValue placeholder="Category" />
+        </SelectTrigger>
+        <SelectContent>
+          {categories.map((cat) => (
+            <SelectItem key={cat.value} value={cat.value}>
+              {cat.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        <div className="flex gap-2 flex-wrap lg:flex-nowrap">
-          <Select
-            value={searchParams.get("category") || "all"}
-            onValueChange={handleCategoryChange}
-          >
-            <SelectTrigger className="w-full lg:w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat.value} value={cat.value}>
-                  {cat.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <Select
+        value={searchParams.get("pricing") || "all"}
+        onValueChange={(v) => updateParam("pricing", v)}
+      >
+        <SelectTrigger className={stacked ? "w-full" : "w-full lg:w-[140px]"}>
+          <SelectValue placeholder="Pricing" />
+        </SelectTrigger>
+        <SelectContent>
+          {pricingOptions.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-          <Select
-            value={searchParams.get("pricing") || "all"}
-            onValueChange={handlePricingChange}
-          >
-            <SelectTrigger className="w-full lg:w-[150px]">
-              <SelectValue placeholder="Pricing" />
-            </SelectTrigger>
-            <SelectContent>
-              {pricingOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Select
+        value={searchParams.get("sort") || "popularity"}
+        onValueChange={(v) => updateParam("sort", v === "popularity" ? null : v)}
+      >
+        <SelectTrigger className={stacked ? "w-full" : "w-full lg:w-[160px]"}>
+          <SelectValue placeholder="Sort by" />
+        </SelectTrigger>
+        <SelectContent>
+          {sortOptions.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  const AdvancedControls = ({ stacked = false }: { stacked?: boolean }) => (
+    <div className={stacked ? "space-y-4" : "flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-wrap"}>
+      <Select
+        value={searchParams.get("rating") || "all"}
+        onValueChange={(v) => updateParam("rating", v)}
+      >
+        <SelectTrigger className={stacked ? "w-full" : "w-full sm:w-[150px]"}>
+          <SelectValue placeholder="Rating" />
+        </SelectTrigger>
+        <SelectContent>
+          {ratingOptions.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <div className="flex items-center space-x-2 bg-muted/50 px-3 py-2 rounded-lg w-full sm:w-auto">
+        <Switch
+          id="api-filter"
+          checked={searchParams.get("hasApi") === "true"}
+          onCheckedChange={handleApiToggle}
+        />
+        <Label htmlFor="api-filter" className="text-sm cursor-pointer">
+          Has API Access
+        </Label>
       </div>
+    </div>
+  );
 
-      {/* Advanced filters toggle */}
-      <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
-        <CollapsibleTrigger asChild>
-          <Button variant="ghost" size="sm" className="gap-2">
-            <SlidersHorizontal className="h-4 w-4" />
-            {showAdvanced ? "Hide" : "Show"} Advanced Filters
-          </Button>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-wrap">
-            {/* Rating filter */}
-            <Select
-              value={searchParams.get("rating") || "all"}
-              onValueChange={handleRatingChange}
-            >
-              <SelectTrigger className="w-full sm:w-[150px]">
-                <SelectValue placeholder="Rating" />
-              </SelectTrigger>
-              <SelectContent>
-                {ratingOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Sort by */}
-            <Select
-              value={searchParams.get("sort") || "popularity"}
-              onValueChange={handleSortChange}
-            >
-              <SelectTrigger className="w-full sm:w-[160px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                {sortOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* API availability toggle */}
-            <div className="flex items-center space-x-2 bg-muted/50 px-3 py-2 rounded-lg">
-              <Switch
-                id="api-filter"
-                checked={searchParams.get("hasApi") === "true"}
-                onCheckedChange={handleApiToggle}
-              />
-              <Label htmlFor="api-filter" className="text-sm cursor-pointer">
-                Has API Access
-              </Label>
-            </div>
+  return (
+    <div className="sticky top-2 z-30 mb-8">
+      <div className="glass p-3 sm:p-5 rounded-2xl space-y-4 shadow-card">
+        {/* Search row */}
+        <div className="flex gap-2 items-center">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Search AI tools..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-9 pr-9"
+              aria-label="Search tools"
+            />
+            {searchInput && (
+              <button
+                type="button"
+                onClick={() => setSearchInput("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-muted text-muted-foreground"
+                aria-label="Clear search"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
-        </CollapsibleContent>
-      </Collapsible>
 
-      {/* Results count and active filters */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm text-muted-foreground font-medium">
-            {totalCount} tools found
-          </span>
-          {activeFilters.length > 0 && (
-            <>
-              <span className="text-muted-foreground">•</span>
-              {activeFilters.map((filter) => (
-                <Badge key={filter} variant="secondary" className="gap-1">
-                  {getFilterLabel(filter, searchParams.get(filter) || "")}
-                </Badge>
-              ))}
-            </>
+          {/* Mobile filter trigger */}
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="lg:hidden relative shrink-0" aria-label="Open filters">
+                <Filter className="h-4 w-4" />
+                {activeFilterCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 min-w-4 px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Filters</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 space-y-6">
+                <FilterControls stacked />
+                <div className="border-t pt-4">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Advanced</p>
+                  <AdvancedControls stacked />
+                </div>
+              </div>
+              <SheetFooter className="mt-6 gap-2 flex-row">
+                <Button variant="outline" className="flex-1" onClick={clearFilters}>
+                  Clear
+                </Button>
+                <SheetClose asChild>
+                  <Button className="flex-1">Show {totalCount} results</Button>
+                </SheetClose>
+              </SheetFooter>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        {/* Desktop inline controls */}
+        <div className="hidden lg:flex flex-col gap-4">
+          <FilterControls />
+
+          <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-2 -ml-2">
+                <SlidersHorizontal className="h-4 w-4" />
+                {showAdvanced ? "Hide" : "More"} filters
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-3">
+              <AdvancedControls />
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+
+        {/* Results + active filter pills */}
+        <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-border/40">
+          <div className="flex items-center gap-2 flex-wrap pt-2">
+            <span className="text-xs sm:text-sm text-muted-foreground font-medium">
+              {totalCount} {totalCount === 1 ? "tool" : "tools"}
+            </span>
+            {activeFilterKeys.length > 0 && (
+              <>
+                <span className="text-muted-foreground">•</span>
+                {activeFilterKeys.map((key) => (
+                  <Badge key={key} variant="secondary" className="gap-1 text-[10px] sm:text-xs">
+                    {getFilterLabel(key, searchParams.get(key) || "")}
+                    <button
+                      type="button"
+                      onClick={() => updateParam(key, null)}
+                      className="ml-0.5 hover:text-foreground"
+                      aria-label={`Remove ${key} filter`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </>
+            )}
+          </div>
+          {(activeFilterKeys.length > 0 || searchInput) && (
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="pt-2">
+              <X className="h-4 w-4 mr-1" />
+              Clear all
+            </Button>
           )}
         </div>
-        {(activeFilters.length > 0 || searchInput) && (
-          <Button variant="ghost" size="sm" onClick={clearFilters}>
-            <X className="h-4 w-4 mr-2" />
-            Clear All
-          </Button>
-        )}
       </div>
     </div>
   );
