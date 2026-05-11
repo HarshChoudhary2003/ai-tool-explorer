@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,20 @@ export function FilterBar({ totalCount }: FilterBarProps) {
   const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isStuck, setIsStuck] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Detect when the bar becomes sticky to upgrade contrast and shadow
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsStuck(!entry.isIntersecting),
+      { rootMargin: "-65px 0px 0px 0px", threshold: 0 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   // Keep local search input synced when URL changes (back/forward, reset)
   useEffect(() => {
@@ -208,8 +222,24 @@ export function FilterBar({ totalCount }: FilterBarProps) {
   );
 
   return (
-    <div className="sticky top-2 z-30 mb-8">
-      <div className="glass p-3 sm:p-5 rounded-2xl space-y-4 shadow-card">
+    <>
+      {/* Sentinel sits above the sticky bar; when it scrolls offscreen, bar is stuck */}
+      <div ref={sentinelRef} aria-hidden="true" className="h-px -mt-px" />
+      <div
+        className={cn(
+          "sticky top-16 z-30 mb-8 transition-all duration-300",
+          isStuck && "pt-2"
+        )}
+      >
+        <div
+          className={cn(
+            "rounded-2xl space-y-4 transition-all duration-300 border",
+            "p-3 sm:p-5",
+            isStuck
+              ? "bg-background/85 backdrop-blur-xl border-border/70 shadow-elegant"
+              : "glass border-border/50 shadow-card"
+          )}
+        >
         {/* Search row */}
         <div className="flex gap-2 items-center">
           <div className="flex-1 relative">
@@ -288,14 +318,22 @@ export function FilterBar({ totalCount }: FilterBarProps) {
         {/* Results + active filter pills */}
         <div className="flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-border/40">
           <div className="flex items-center gap-2 flex-wrap pt-2">
-            <span className="text-xs sm:text-sm text-muted-foreground font-medium">
-              {totalCount} {totalCount === 1 ? "tool" : "tools"}
+            <span className="text-xs sm:text-sm font-semibold">
+              <span className="text-foreground">{totalCount}</span>
+              <span className="text-muted-foreground font-medium">
+                {" "}
+                {totalCount === 1 ? "tool" : "tools"}
+              </span>
             </span>
             {activeFilterKeys.length > 0 && (
               <>
                 <span className="text-muted-foreground">•</span>
                 {activeFilterKeys.map((key) => (
-                  <Badge key={key} variant="secondary" className="gap-1 text-[10px] sm:text-xs">
+                  <Badge
+                    key={key}
+                    variant="secondary"
+                    className="gap-1 text-[10px] sm:text-xs bg-primary/10 text-primary border border-primary/30 hover:bg-primary/15"
+                  >
                     {getFilterLabel(key, searchParams.get(key) || "")}
                     <button
                       type="button"
@@ -309,6 +347,22 @@ export function FilterBar({ totalCount }: FilterBarProps) {
                 ))}
               </>
             )}
+            {searchParams.get("search") && (
+              <Badge
+                variant="secondary"
+                className="gap-1 text-[10px] sm:text-xs bg-primary/10 text-primary border border-primary/30"
+              >
+                "{searchParams.get("search")}"
+                <button
+                  type="button"
+                  onClick={() => setSearchInput("")}
+                  className="ml-0.5 hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            )}
           </div>
           {(activeFilterKeys.length > 0 || searchInput) && (
             <Button variant="ghost" size="sm" onClick={clearFilters} className="pt-2">
@@ -317,7 +371,8 @@ export function FilterBar({ totalCount }: FilterBarProps) {
             </Button>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
