@@ -276,19 +276,37 @@ export function FilterBar({ totalCount }: FilterBarProps) {
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Filters</SheetTitle>
+            <SheetContent
+              side="right"
+              className="w-full sm:max-w-md flex flex-col p-0 gap-0"
+            >
+              <SheetHeader className="px-6 pt-6 pb-4 border-b shrink-0">
+                <SheetTitle className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-primary" />
+                  Filters
+                  {activeFilterCount > 0 && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+                      {activeFilterCount} active
+                    </span>
+                  )}
+                </SheetTitle>
               </SheetHeader>
-              <div className="mt-6 space-y-6">
+              <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
                 <FilterControls stacked />
                 <div className="border-t pt-4">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">Advanced</p>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
+                    Advanced
+                  </p>
                   <AdvancedControls stacked />
                 </div>
               </div>
-              <SheetFooter className="mt-6 gap-2 flex-row">
-                <Button variant="outline" className="flex-1" onClick={clearFilters}>
+              <SheetFooter className="px-6 py-4 border-t bg-background/95 backdrop-blur gap-2 flex-row shrink-0">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={clearFilters}
+                  disabled={activeFilterCount === 0}
+                >
                   Clear
                 </Button>
                 <SheetClose asChild>
