@@ -16,7 +16,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Pencil, Trash2, Shield, Users, Wrench, Mail, FileText, MessageSquare } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Shield, Users, Wrench, Mail, FileText, MessageSquare, AlertTriangle, CheckCircle2, Upload, FileJson, Download } from "lucide-react";
+import { validateDataset, parseCSV, normalizeToolRow, type ToolIssue } from "@/lib/datasetValidation";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const CATEGORIES = [
   "llm", "image_generation", "voice", "automation", "no_code", "video",
@@ -38,6 +40,11 @@ export default function Admin() {
   const [users, setUsers] = useState<any[]>([]);
   const [editingTool, setEditingTool] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{ inserted: number; updated: number; failed: number } | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
