@@ -103,6 +103,7 @@ export default function Tools() {
     }
 
     // Sorting
+    const priceRank: Record<string, number> = { free: 0, freemium: 1, paid: 2, enterprise: 3 };
     switch (sort) {
       case "rating":
         filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -112,6 +113,30 @@ export default function Tools() {
         break;
       case "newest":
         filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        break;
+      case "newest_2026": {
+        const score = (t: any) => {
+          const hay = `${t.name} ${t.description}`.toLowerCase();
+          let s = 0;
+          if (/\b2026\b/.test(hay)) s += 3;
+          if (/\b(gpt-?5|claude 4|sora 2|grok 4|veo 3|kling 2|gemini 2|llama 4|mistral large 3|deepseek v3|qwen 3|flux\.?1\.?1|midjourney v7|ideogram 3|suno v5|udio v2|elevenlabs v3)\b/.test(hay)) s += 2;
+          return s;
+        };
+        filtered.sort((a, b) => {
+          const d = score(b) - score(a);
+          if (d !== 0) return d;
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        });
+        break;
+      }
+      case "price_asc":
+        filtered.sort((a, b) => (priceRank[a.pricing] ?? 99) - (priceRank[b.pricing] ?? 99) || (b.popularity_score || 0) - (a.popularity_score || 0));
+        break;
+      case "price_desc":
+        filtered.sort((a, b) => (priceRank[b.pricing] ?? -1) - (priceRank[a.pricing] ?? -1) || (b.popularity_score || 0) - (a.popularity_score || 0));
+        break;
+      case "api_first":
+        filtered.sort((a, b) => Number(!!b.has_api) - Number(!!a.has_api) || (b.popularity_score || 0) - (a.popularity_score || 0));
         break;
       case "popularity":
       default:

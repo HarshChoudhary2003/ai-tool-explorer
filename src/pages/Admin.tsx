@@ -16,7 +16,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Pencil, Trash2, Shield, Users, Wrench, Mail, FileText, MessageSquare } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Shield, Users, Wrench, Mail, FileText, MessageSquare, AlertTriangle, CheckCircle2, Upload, FileJson, Download } from "lucide-react";
+import { validateDataset, parseCSV, normalizeToolRow, type ToolIssue } from "@/lib/datasetValidation";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const CATEGORIES = [
   "llm", "image_generation", "voice", "automation", "no_code", "video",
@@ -38,6 +40,11 @@ export default function Admin() {
   const [users, setUsers] = useState<any[]>([]);
   const [editingTool, setEditingTool] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importPreview, setImportPreview] = useState<any[]>([]);
+  const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<{ inserted: number; updated: number; failed: number } | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -175,6 +182,117 @@ export default function Admin() {
     }
   };
 
+  // ---------- Dataset validation ----------
+  const validation = validateDataset(tools);
+
+  const exportIssuesCSV = () => {
+    const header = "name,missing,warnings\n";
+    const rows = validation.issues.map((i) =>
+      [i.name, i.missing.join("|"), i.warnings.join("|")]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "dataset-issues.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // ---------- Bulk import ----------
+  const parseImport = (raw: string) => {
+    setImportErrors([]);
+    setImportResult(null);
+    const text = raw.trim();
+    if (!text) { setImportPreview([]); return; }
+    try {
+      let rows: any[] = [];
+      if (text.startsWith("[") || text.startsWith("{")) {
+        const parsed = JSON.parse(text);
+        rows = Array.isArray(parsed) ? parsed : [parsed];
+      } else {
+        rows = parseCSV(text);
+      }
+      const normalized = rows.map(normalizeToolRow);
+      const errs: string[] = [];
+      normalized.forEach((r, i) => {
+        if (!r.name) errs.push(`Row ${i + 1}: missing "name"`);
+        if (!r.description) errs.push(`Row ${i + 1}: missing "description"`);
+        if (!r.website_url) errs.push(`Row ${i + 1}: missing "website_url"`);
+        if (!r.category) errs.push(`Row ${i + 1}: missing "category"`);
+        if (!r.pricing) errs.push(`Row ${i + 1}: missing "pricing"`);
+      });
+      setImportErrors(errs);
+      setImportPreview(normalized);
+    } catch (e: any) {
+      setImportPreview([]);
+      setImportErrors([`Parse error: ${e.message}`]);
+    }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    const text = await file.text();
+    setImportText(text);
+    parseImport(text);
+  };
+
+  const runBulkImport = async () => {
+    if (importPreview.length === 0 || importErrors.length > 0) return;
+    setImporting(true);
+    let inserted = 0, updated = 0, failed = 0;
+    // Fetch existing names once to decide insert vs update
+    const { data: existing } = await supabase.from("ai_tools").select("id, name");
+    const byName = new Map((existing || []).map((t) => [t.name.toLowerCase(), t.id]));
+    for (const row of importPreview) {
+      try {
+        const existingId = byName.get(String(row.name).toLowerCase());
+        if (existingId) {
+          const { error } = await supabase.from("ai_tools").update(row).eq("id", existingId);
+          if (error) throw error; updated++;
+        } else {
+          const { error } = await supabase.from("ai_tools").insert([row]);
+          if (error) throw error; inserted++;
+        }
+      } catch (e) {
+        failed++;
+      }
+    }
+    setImportResult({ inserted, updated, failed });
+    setImporting(false);
+    toast({ title: "Bulk import complete", description: `${inserted} added, ${updated} updated, ${failed} failed` });
+    fetchData();
+  };
+
+  const downloadTemplate = (kind: "json" | "csv") => {
+    const sample = [{
+      name: "Example AI Tool",
+      description: "A brief description of what the tool does",
+      category: "llm",
+      pricing: "freemium",
+      website_url: "https://example.com",
+      has_api: true,
+      api_details: "REST + SDK",
+      pricing_details: "Free tier + $20/mo pro",
+      rating: 4.5,
+      popularity_score: 1000,
+      tasks: "text generation|summarization",
+      pros: "fast|accurate",
+      cons: "limited free tier",
+      use_cases: "writing|research",
+    }];
+    let content = "", type = "", ext = "";
+    if (kind === "json") {
+      content = JSON.stringify(sample, null, 2); type = "application/json"; ext = "json";
+    } else {
+      const keys = Object.keys(sample[0]);
+      content = keys.join(",") + "\n" + keys.map((k) => `"${String((sample[0] as any)[k]).replace(/"/g, '""')}"`).join(",");
+      type = "text/csv"; ext = "csv";
+    }
+    const url = URL.createObjectURL(new Blob([content], { type }));
+    const a = document.createElement("a");
+    a.href = url; a.download = `tools-template.${ext}`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gradient-secondary flex flex-col">
@@ -254,6 +372,15 @@ export default function Admin() {
         <Tabs defaultValue="tools" className="space-y-6">
           <TabsList className="glass">
             <TabsTrigger value="tools">AI Tools</TabsTrigger>
+            <TabsTrigger value="validation">
+              Validation
+              {validation.issueCount > 0 && (
+                <span className="ml-2 px-1.5 py-0.5 rounded-full bg-destructive/20 text-destructive text-[10px] font-bold">
+                  {validation.issueCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="import">Bulk Import</TabsTrigger>
             <TabsTrigger value="contacts">Messages</TabsTrigger>
             <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
@@ -396,6 +523,231 @@ export default function Admin() {
                       ))}
                     </TableBody>
                   </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Validation Tab */}
+          <TabsContent value="validation">
+            <Card className="glass">
+              <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-primary" />
+                    Dataset Validation Report
+                  </CardTitle>
+                  <CardDescription>Tools with missing required fields or data quality warnings.</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={exportIssuesCSV} disabled={validation.issueCount === 0}>
+                  <Download className="h-4 w-4 mr-2" /> Export CSV
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="rounded-xl border p-3">
+                    <p className="text-xs text-muted-foreground">Total tools</p>
+                    <p className="text-2xl font-bold">{validation.total}</p>
+                  </div>
+                  <div className="rounded-xl border p-3">
+                    <p className="text-xs text-muted-foreground">Complete</p>
+                    <p className="text-2xl font-bold text-green-500">{validation.complete}</p>
+                  </div>
+                  <div className="rounded-xl border p-3">
+                    <p className="text-xs text-muted-foreground">With issues</p>
+                    <p className="text-2xl font-bold text-destructive">{validation.issueCount}</p>
+                  </div>
+                  <div className="rounded-xl border p-3">
+                    <p className="text-xs text-muted-foreground">Health</p>
+                    <p className="text-2xl font-bold">
+                      {validation.total ? Math.round((validation.complete / validation.total) * 100) : 100}%
+                    </p>
+                  </div>
+                </div>
+
+                {Object.keys(validation.missingByField).length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold mb-2">Missing fields breakdown</p>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(validation.missingByField).map(([field, count]) => (
+                        <Badge key={field} variant="destructive" className="gap-1">
+                          {field}: {count}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {validation.issueCount === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <CheckCircle2 className="h-12 w-12 text-green-500 mb-3" />
+                    <p className="font-semibold">All tools pass validation</p>
+                    <p className="text-sm text-muted-foreground">Every entry has pricing, API status, URL, and category.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Tool</TableHead>
+                          <TableHead>Missing</TableHead>
+                          <TableHead>Warnings</TableHead>
+                          <TableHead className="text-right">Fix</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {validation.issues.slice(0, 100).map((issue: ToolIssue) => (
+                          <TableRow key={issue.id}>
+                            <TableCell className="font-medium">{issue.name}</TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {issue.missing.map((m) => (
+                                  <Badge key={m} variant="destructive" className="text-[10px]">{m}</Badge>
+                                ))}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {issue.warnings.map((w) => (
+                                  <Badge key={w} variant="secondary" className="text-[10px]">{w}</Badge>
+                                ))}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="icon" onClick={() => {
+                                const tool = tools.find((t) => t.id === issue.id);
+                                if (tool) handleEdit(tool);
+                              }}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    {validation.issues.length > 100 && (
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Showing first 100 of {validation.issues.length}. Export CSV for the full report.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Bulk Import Tab */}
+          <TabsContent value="import">
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5 text-primary" />
+                  Bulk Import Tools
+                </CardTitle>
+                <CardDescription>
+                  Upload a JSON or CSV dataset. Rows are matched by <span className="font-mono">name</span> — existing tools are updated, new ones are inserted.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={() => downloadTemplate("json")}>
+                    <FileJson className="h-4 w-4 mr-2" /> JSON template
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => downloadTemplate("csv")}>
+                    <FileText className="h-4 w-4 mr-2" /> CSV template
+                  </Button>
+                  <label className="inline-flex">
+                    <input
+                      type="file"
+                      accept=".json,.csv,application/json,text/csv"
+                      className="hidden"
+                      onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+                    />
+                    <span className="inline-flex items-center h-9 px-3 rounded-md border border-input bg-background text-sm cursor-pointer hover:bg-muted">
+                      <Upload className="h-4 w-4 mr-2" /> Upload file
+                    </span>
+                  </label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Or paste JSON / CSV</Label>
+                  <Textarea
+                    rows={8}
+                    className="font-mono text-xs"
+                    placeholder='[{"name":"Example","description":"...","category":"llm","pricing":"freemium","website_url":"https://...","has_api":true}]'
+                    value={importText}
+                    onChange={(e) => { setImportText(e.target.value); parseImport(e.target.value); }}
+                  />
+                </div>
+
+                {importErrors.length > 0 && (
+                  <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm space-y-1">
+                    <p className="font-semibold text-destructive flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" /> {importErrors.length} problem(s) — fix before importing
+                    </p>
+                    <ul className="list-disc pl-5 text-xs text-destructive/90 max-h-32 overflow-y-auto">
+                      {importErrors.slice(0, 20).map((e, i) => <li key={i}>{e}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {importPreview.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold mb-2">
+                      Preview — {importPreview.length} row(s)
+                    </p>
+                    <ScrollArea className="h-56 rounded-lg border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Category</TableHead>
+                            <TableHead>Pricing</TableHead>
+                            <TableHead>API</TableHead>
+                            <TableHead>URL</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {importPreview.slice(0, 50).map((r, i) => (
+                            <TableRow key={i}>
+                              <TableCell className="font-medium">{r.name || <span className="text-destructive">—</span>}</TableCell>
+                              <TableCell>{r.category || "—"}</TableCell>
+                              <TableCell>{r.pricing || "—"}</TableCell>
+                              <TableCell>{r.has_api ? "Yes" : "No"}</TableCell>
+                              <TableCell className="max-w-[240px] truncate text-xs">{r.website_url || "—"}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
+                  </div>
+                )}
+
+                {importResult && (
+                  <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-3 text-sm">
+                    <p className="font-semibold flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500" /> Import complete
+                    </p>
+                    <p className="text-xs mt-1">
+                      Inserted <b>{importResult.inserted}</b> · Updated <b>{importResult.updated}</b> · Failed <b>{importResult.failed}</b>
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => { setImportText(""); setImportPreview([]); setImportErrors([]); setImportResult(null); }}
+                  >
+                    Clear
+                  </Button>
+                  <Button
+                    onClick={runBulkImport}
+                    disabled={importing || importPreview.length === 0 || importErrors.length > 0}
+                  >
+                    {importing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+                    Import {importPreview.length || ""} tool{importPreview.length === 1 ? "" : "s"}
+                  </Button>
                 </div>
               </CardContent>
             </Card>

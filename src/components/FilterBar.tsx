@@ -62,6 +62,10 @@ const sortOptions = [
   { value: "rating", label: "Highest Rated" },
   { value: "name", label: "Name A-Z" },
   { value: "newest", label: "Newest First" },
+  { value: "newest_2026", label: "2026 Relevance" },
+  { value: "price_asc", label: "Price: Low → High" },
+  { value: "price_desc", label: "Price: High → Low" },
+  { value: "api_first", label: "API Available First" },
 ];
 
 export function FilterBar({ totalCount }: FilterBarProps) {
