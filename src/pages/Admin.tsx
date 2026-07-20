@@ -72,9 +72,9 @@ export default function Admin() {
     
     const [toolsRes, contactsRes, subscribersRes, profilesRes] = await Promise.all([
       supabase.from("ai_tools").select("*").order("created_at", { ascending: false }),
-      supabase.from("contacts").select("*").order("created_at", { ascending: false }).limit(50),
-      supabase.from("newsletter_subscribers").select("*").order("subscribed_at", { ascending: false }).limit(50),
-      supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(50),
+      supabase.from("contacts").select("id, name, subject, created_at").order("created_at", { ascending: false }).limit(50),
+      supabase.from("newsletter_subscribers").select("id, subscribed_at, is_active").order("subscribed_at", { ascending: false }).limit(50),
+      supabase.from("profiles").select("id, user_id, display_name, avatar_url, created_at").order("created_at", { ascending: false }).limit(50),
     ]);
 
     if (toolsRes.data) setTools(toolsRes.data);
