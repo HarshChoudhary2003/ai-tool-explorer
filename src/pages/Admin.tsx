@@ -372,6 +372,15 @@ export default function Admin() {
         <Tabs defaultValue="tools" className="space-y-6">
           <TabsList className="glass">
             <TabsTrigger value="tools">AI Tools</TabsTrigger>
+            <TabsTrigger value="validation">
+              Validation
+              {validation.issueCount > 0 && (
+                <span className="ml-2 px-1.5 py-0.5 rounded-full bg-destructive/20 text-destructive text-[10px] font-bold">
+                  {validation.issueCount}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="import">Bulk Import</TabsTrigger>
             <TabsTrigger value="contacts">Messages</TabsTrigger>
             <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
