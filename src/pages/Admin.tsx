@@ -182,6 +182,117 @@ export default function Admin() {
     }
   };
 
+  // ---------- Dataset validation ----------
+  const validation = validateDataset(tools);
+
+  const exportIssuesCSV = () => {
+    const header = "name,missing,warnings\n";
+    const rows = validation.issues.map((i) =>
+      [i.name, i.missing.join("|"), i.warnings.join("|")]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "dataset-issues.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // ---------- Bulk import ----------
+  const parseImport = (raw: string) => {
+    setImportErrors([]);
+    setImportResult(null);
+    const text = raw.trim();
+    if (!text) { setImportPreview([]); return; }
+    try {
+      let rows: any[] = [];
+      if (text.startsWith("[") || text.startsWith("{")) {
+        const parsed = JSON.parse(text);
+        rows = Array.isArray(parsed) ? parsed : [parsed];
+      } else {
+        rows = parseCSV(text);
+      }
+      const normalized = rows.map(normalizeToolRow);
+      const errs: string[] = [];
+      normalized.forEach((r, i) => {
+        if (!r.name) errs.push(`Row ${i + 1}: missing "name"`);
+        if (!r.description) errs.push(`Row ${i + 1}: missing "description"`);
+        if (!r.website_url) errs.push(`Row ${i + 1}: missing "website_url"`);
+        if (!r.category) errs.push(`Row ${i + 1}: missing "category"`);
+        if (!r.pricing) errs.push(`Row ${i + 1}: missing "pricing"`);
+      });
+      setImportErrors(errs);
+      setImportPreview(normalized);
+    } catch (e: any) {
+      setImportPreview([]);
+      setImportErrors([`Parse error: ${e.message}`]);
+    }
+  };
+
+  const handleFileUpload = async (file: File) => {
+    const text = await file.text();
+    setImportText(text);
+    parseImport(text);
+  };
+
+  const runBulkImport = async () => {
+    if (importPreview.length === 0 || importErrors.length > 0) return;
+    setImporting(true);
+    let inserted = 0, updated = 0, failed = 0;
+    // Fetch existing names once to decide insert vs update
+    const { data: existing } = await supabase.from("ai_tools").select("id, name");
+    const byName = new Map((existing || []).map((t) => [t.name.toLowerCase(), t.id]));
+    for (const row of importPreview) {
+      try {
+        const existingId = byName.get(String(row.name).toLowerCase());
+        if (existingId) {
+          const { error } = await supabase.from("ai_tools").update(row).eq("id", existingId);
+          if (error) throw error; updated++;
+        } else {
+          const { error } = await supabase.from("ai_tools").insert([row]);
+          if (error) throw error; inserted++;
+        }
+      } catch (e) {
+        failed++;
+      }
+    }
+    setImportResult({ inserted, updated, failed });
+    setImporting(false);
+    toast({ title: "Bulk import complete", description: `${inserted} added, ${updated} updated, ${failed} failed` });
+    fetchData();
+  };
+
+  const downloadTemplate = (kind: "json" | "csv") => {
+    const sample = [{
+      name: "Example AI Tool",
+      description: "A brief description of what the tool does",
+      category: "llm",
+      pricing: "freemium",
+      website_url: "https://example.com",
+      has_api: true,
+      api_details: "REST + SDK",
+      pricing_details: "Free tier + $20/mo pro",
+      rating: 4.5,
+      popularity_score: 1000,
+      tasks: "text generation|summarization",
+      pros: "fast|accurate",
+      cons: "limited free tier",
+      use_cases: "writing|research",
+    }];
+    let content = "", type = "", ext = "";
+    if (kind === "json") {
+      content = JSON.stringify(sample, null, 2); type = "application/json"; ext = "json";
+    } else {
+      const keys = Object.keys(sample[0]);
+      content = keys.join(",") + "\n" + keys.map((k) => `"${String((sample[0] as any)[k]).replace(/"/g, '""')}"`).join(",");
+      type = "text/csv"; ext = "csv";
+    }
+    const url = URL.createObjectURL(new Blob([content], { type }));
+    const a = document.createElement("a");
+    a.href = url; a.download = `tools-template.${ext}`; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gradient-secondary flex flex-col">
