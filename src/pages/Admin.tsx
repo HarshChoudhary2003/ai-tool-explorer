@@ -528,6 +528,231 @@ export default function Admin() {
             </Card>
           </TabsContent>
 
+          {/* Validation Tab */}
+          <TabsContent value="validation">
+            <Card className="glass">
+              <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-primary" />
+                    Dataset Validation Report
+                  </CardTitle>
+                  <CardDescription>Tools with missing required fields or data quality warnings.</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={exportIssuesCSV} disabled={validation.issueCount === 0}>
+                  <Download className="h-4 w-4 mr-2" /> Export CSV
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="rounded-xl border p-3">
+                    <p className="text-xs text-muted-foreground">Total tools</p>
+                    <p className="text-2xl font-bold">{validation.total}</p>
+                  </div>
+                  <div className="rounded-xl border p-3">
+                    <p className="text-xs text-muted-foreground">Complete</p>
+                    <p className="text-2xl font-bold text-green-500">{validation.complete}</p>
+                  </div>
+                  <div className="rounded-xl border p-3">
+                    <p className="text-xs text-muted-foreground">With issues</p>
+                    <p className="text-2xl font-bold text-destructive">{validation.issueCount}</p>
+                  </div>
+                  <div className="rounded-xl border p-3">
+                    <p className="text-xs text-muted-foreground">Health</p>
+                    <p className="text-2xl font-bold">
+                      {validation.total ? Math.round((validation.complete / validation.total) * 100) : 100}%
+                    </p>
+                  </div>
+                </div>
+
+                {Object.keys(validation.missingByField).length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold mb-2">Missing fields breakdown</p>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(validation.missingByField).map(([field, count]) => (
+                        <Badge key={field} variant="destructive" className="gap-1">
+                          {field}: {count}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {validation.issueCount === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-10 text-center">
+                    <CheckCircle2 className="h-12 w-12 text-green-500 mb-3" />
+                    <p className="font-semibold">All tools pass validation</p>
+                    <p className="text-sm text-muted-foreground">Every entry has pricing, API status, URL, and category.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Tool</TableHead>
+                          <TableHead>Missing</TableHead>
+                          <TableHead>Warnings</TableHead>
+                          <TableHead className="text-right">Fix</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {validation.issues.slice(0, 100).map((issue: ToolIssue) => (
+                          <TableRow key={issue.id}>
+                            <TableCell className="font-medium">{issue.name}</TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {issue.missing.map((m) => (
+                                  <Badge key={m} variant="destructive" className="text-[10px]">{m}</Badge>
+                                ))}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-wrap gap-1">
+                                {issue.warnings.map((w) => (
+                                  <Badge key={w} variant="secondary" className="text-[10px]">{w}</Badge>
+                                ))}
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="icon" onClick={() => {
+                                const tool = tools.find((t) => t.id === issue.id);
+                                if (tool) handleEdit(tool);
+                              }}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    {validation.issues.length > 100 && (
+                      <p className="text-xs text-muted-foreground mt-2 text-center">
+                        Showing first 100 of {validation.issues.length}. Export CSV for the full report.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Bulk Import Tab */}
+          <TabsContent value="import">
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5 text-primary" />
+                  Bulk Import Tools
+                </CardTitle>
+                <CardDescription>
+                  Upload a JSON or CSV dataset. Rows are matched by <span className="font-mono">name</span> — existing tools are updated, new ones are inserted.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={() => downloadTemplate("json")}>
+                    <FileJson className="h-4 w-4 mr-2" /> JSON template
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => downloadTemplate("csv")}>
+                    <FileText className="h-4 w-4 mr-2" /> CSV template
+                  </Button>
+                  <label className="inline-flex">
+                    <input
+                      type="file"
+                      accept=".json,.csv,application/json,text/csv"
+                      className="hidden"
+                      onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
+                    />
+                    <span className="inline-flex items-center h-9 px-3 rounded-md border border-input bg-background text-sm cursor-pointer hover:bg-muted">
+                      <Upload className="h-4 w-4 mr-2" /> Upload file
+                    </span>
+                  </label>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Or paste JSON / CSV</Label>
+                  <Textarea
+                    rows={8}
+                    className="font-mono text-xs"
+                    placeholder='[{"name":"Example","description":"...","category":"llm","pricing":"freemium","website_url":"https://...","has_api":true}]'
+                    value={importText}
+                    onChange={(e) => { setImportText(e.target.value); parseImport(e.target.value); }}
+                  />
+                </div>
+
+                {importErrors.length > 0 && (
+                  <div className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm space-y-1">
+                    <p className="font-semibold text-destructive flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4" /> {importErrors.length} problem(s) — fix before importing
+                    </p>
+                    <ul className="list-disc pl-5 text-xs text-destructive/90 max-h-32 overflow-y-auto">
+                      {importErrors.slice(0, 20).map((e, i) => <li key={i}>{e}</li>)}
+                    </ul>
+                  </div>
+                )}
+
+                {importPreview.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold mb-2">
+                      Preview — {importPreview.length} row(s)
+                    </p>
+                    <ScrollArea className="h-56 rounded-lg border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Category</TableHead>
+                            <TableHead>Pricing</TableHead>
+                            <TableHead>API</TableHead>
+                            <TableHead>URL</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {importPreview.slice(0, 50).map((r, i) => (
+                            <TableRow key={i}>
+                              <TableCell className="font-medium">{r.name || <span className="text-destructive">—</span>}</TableCell>
+                              <TableCell>{r.category || "—"}</TableCell>
+                              <TableCell>{r.pricing || "—"}</TableCell>
+                              <TableCell>{r.has_api ? "Yes" : "No"}</TableCell>
+                              <TableCell className="max-w-[240px] truncate text-xs">{r.website_url || "—"}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </ScrollArea>
+                  </div>
+                )}
+
+                {importResult && (
+                  <div className="rounded-lg border border-green-500/40 bg-green-500/10 p-3 text-sm">
+                    <p className="font-semibold flex items-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-green-500" /> Import complete
+                    </p>
+                    <p className="text-xs mt-1">
+                      Inserted <b>{importResult.inserted}</b> · Updated <b>{importResult.updated}</b> · Failed <b>{importResult.failed}</b>
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => { setImportText(""); setImportPreview([]); setImportErrors([]); setImportResult(null); }}
+                  >
+                    Clear
+                  </Button>
+                  <Button
+                    onClick={runBulkImport}
+                    disabled={importing || importPreview.length === 0 || importErrors.length > 0}
+                  >
+                    {importing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+                    Import {importPreview.length || ""} tool{importPreview.length === 1 ? "" : "s"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Messages Tab */}
           <TabsContent value="contacts">
             <Card className="glass">
