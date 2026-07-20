@@ -211,7 +211,7 @@ export default function Index() {
             >
               Discover the{" "}
               <span className="gradient-text">Best AI Tools</span>{" "}
-              of 2025
+              of 2026
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
