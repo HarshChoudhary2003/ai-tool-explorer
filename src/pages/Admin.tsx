@@ -415,14 +415,14 @@ export default function Admin() {
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <p className="font-medium">{contact.name}</p>
-                          <p className="text-sm text-muted-foreground">{contact.email}</p>
+                          <p className="text-xs text-muted-foreground italic">Email hidden — view via secure export</p>
                         </div>
                         <span className="text-xs text-muted-foreground">
                           {new Date(contact.created_at).toLocaleDateString()}
                         </span>
                       </div>
                       {contact.subject && <p className="text-sm font-medium mb-2">{contact.subject}</p>}
-                      <p className="text-sm text-muted-foreground">{contact.message}</p>
+                      <p className="text-xs text-muted-foreground italic">Message body hidden for privacy</p>
                     </Card>
                   ))}
                   {contacts.length === 0 && (
@@ -444,7 +444,7 @@ export default function Admin() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Email</TableHead>
+                      <TableHead>Subscriber</TableHead>
                       <TableHead>Subscribed At</TableHead>
                       <TableHead>Status</TableHead>
                     </TableRow>
@@ -452,7 +452,7 @@ export default function Admin() {
                   <TableBody>
                     {subscribers.map((sub) => (
                       <TableRow key={sub.id}>
-                        <TableCell>{sub.email}</TableCell>
+                        <TableCell className="font-mono text-xs">{sub.id.slice(0, 8)}…</TableCell>
                         <TableCell>{new Date(sub.subscribed_at).toLocaleDateString()}</TableCell>
                         <TableCell>
                           <Badge variant={sub.is_active ? "default" : "secondary"}>
@@ -479,7 +479,7 @@ export default function Admin() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
+                      <TableHead>User ID</TableHead>
                       <TableHead>Joined</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -487,7 +487,7 @@ export default function Admin() {
                     {users.map((u) => (
                       <TableRow key={u.id}>
                         <TableCell>{u.display_name || "—"}</TableCell>
-                        <TableCell>{u.email}</TableCell>
+                        <TableCell className="font-mono text-xs">{u.user_id?.slice(0, 8)}…</TableCell>
                         <TableCell>{new Date(u.created_at).toLocaleDateString()}</TableCell>
                       </TableRow>
                     ))}
