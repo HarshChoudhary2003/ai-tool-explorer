@@ -75,6 +75,43 @@ Deno.serve(async (req: Request): Promise<Response> => {
   try {
     console.log("Starting new tools notification check...");
 
+    // Require either an admin JWT or a valid cron shared secret
+    const authHeader = req.headers.get("Authorization");
+    const cronSecret = req.headers.get("x-cron-secret");
+    const expectedCronSecret = Deno.env.get("CRON_SECRET");
+
+    let authorized = false;
+    if (expectedCronSecret && cronSecret && cronSecret === expectedCronSecret) {
+      authorized = true;
+    } else if (authHeader?.startsWith("Bearer ")) {
+      const authClient = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_ANON_KEY")!,
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      const token = authHeader.replace("Bearer ", "");
+      const { data: claims } = await authClient.auth.getClaims(token);
+      const userId = claims?.claims?.sub;
+      if (userId) {
+        const admin = createClient(
+          Deno.env.get("SUPABASE_URL")!,
+          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+        );
+        const { data: hasAdminRole } = await admin.rpc("has_role", {
+          _user_id: userId,
+          _role: "admin",
+        });
+        authorized = !!hasAdminRole;
+      }
+    }
+
+    if (!authorized) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Unauthorized" }),
+        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
