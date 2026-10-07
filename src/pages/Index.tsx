@@ -182,20 +182,15 @@ export default function Index() {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden mesh-bg">
-        {/* Floating decorative blobs */}
-        <div className="absolute top-20 -left-20 h-72 w-72 rounded-full bg-primary/20 blur-3xl animate-float pointer-events-none" />
-        <div className="absolute top-40 -right-20 h-80 w-80 rounded-full bg-secondary/20 blur-3xl animate-float pointer-events-none" style={{ animationDelay: "2s" }} />
-        <div className="absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-accent/15 blur-3xl animate-float pointer-events-none" style={{ animationDelay: "4s" }} />
-
-        <div className="container mx-auto px-4 py-16 sm:py-20 lg:py-28 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-6 sm:space-y-8">
+      <section className="relative min-h-[calc(100svh-4rem)] overflow-hidden border-b border-border/40">
+        <div className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 relative z-10 min-h-[calc(100svh-4rem)] flex items-end">
+          <div className="w-full max-w-6xl space-y-6 sm:space-y-8">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <Badge className="mb-4 glass border-primary/30 text-primary text-sm sm:text-base px-4 py-2 animate-pulse-glow">
+              <Badge className="mb-4 rounded-sm glass border-primary/40 text-primary text-xs uppercase px-4 py-2">
                 <Sparkles className="h-4 w-4 mr-2" />
                 <span className="font-bold tabular-nums">
                   {animatedCount > 0 ? animatedCount : "500"}+
@@ -207,17 +202,16 @@ export default function Index() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight"
+              className="max-w-5xl font-display text-6xl sm:text-8xl lg:text-[8.5rem] font-normal leading-[0.82] text-left"
             >
-              Discover the{" "}
-              <span className="gradient-text">Best AI Tools</span>{" "}
-              of 2026
+              Discover the <i className="text-primary">Best</i><br />
+              AI Tools <span className="text-secondary">of 2026</span>
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4"
+              className="text-base sm:text-lg text-muted-foreground max-w-xl text-left border-l border-secondary/50 pl-4"
             >
               Explore, compare, and pick the perfect AI tool — from GPT-5 and Claude 4
               to Sora 2, Veo 3 and the latest agentic copilots.
@@ -228,7 +222,7 @@ export default function Index() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="max-w-2xl mx-auto flex flex-col sm:flex-row gap-2 px-4"
+              className="max-w-2xl flex flex-col sm:flex-row gap-2"
             >
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
@@ -237,7 +231,7 @@ export default function Index() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                  className="h-12 sm:h-14 text-base pl-12 glass border-border/60"
+                  className="h-12 sm:h-14 rounded-sm text-base pl-12 glass border-border/60"
                 />
               </div>
               <Button onClick={handleSearch} size="lg" className="h-12 sm:h-14 px-6 sm:px-8 bg-gradient-primary hover:opacity-90">
@@ -251,7 +245,7 @@ export default function Index() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex gap-3 sm:gap-4 justify-center flex-wrap px-4"
+              className="flex gap-3 sm:gap-4 justify-start flex-wrap"
             >
               <Button asChild variant="outline" className="glass text-sm sm:text-base">
                 <Link to="/tools">

@@ -238,11 +238,11 @@ export function FilterBar({ totalCount }: FilterBarProps) {
       >
         <div
           className={cn(
-            "rounded-2xl space-y-4 transition-all duration-300 border",
+            "rounded-sm space-y-4 transition-all duration-300 border",
             "p-3 sm:p-5",
             isStuck
-              ? "bg-background/85 backdrop-blur-xl border-border/70 shadow-elegant"
-              : "glass border-border/50 shadow-card"
+              ? "bg-background/90 backdrop-blur-2xl border-primary/30 shadow-elegant"
+              : "glass border-border/60 shadow-card"
           )}
         >
         {/* Search row */}

@@ -1,4 +1,4 @@
-import { Float, MeshTransmissionMaterial } from "@react-three/drei";
+import { Environment, Float, Lightformer, MeshTransmissionMaterial } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
@@ -93,6 +93,11 @@ export function GalleryScene() {
         <directionalLight position={[5, 6, 7]} intensity={2.4} color="#f2f2ee" />
         <pointLight position={[-5, -2, 3]} intensity={18} color="#ff5c35" distance={12} />
         <pointLight position={[4, 3, 2]} intensity={10} color="#63e6be" distance={10} />
+        <Environment resolution={64}>
+          <Lightformer intensity={2.2} position={[0, 5, -4]} scale={[8, 2, 1]} />
+          <Lightformer intensity={1.4} color="#ff5c35" position={[-5, 1, 1]} rotation-y={Math.PI / 2} scale={[5, 1, 1]} />
+          <Lightformer intensity={1.1} color="#63e6be" position={[5, -1, 0]} rotation-y={-Math.PI / 2} scale={[5, 1, 1]} />
+        </Environment>
         <Sculpture reducedMotion={reducedMotion} routeSeed={routeSeed} />
       </Canvas>
       <div className="gallery-scene-vignette" />

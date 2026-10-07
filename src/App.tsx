@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/hooks/useTheme";
+import { GalleryFrame } from "@/components/GalleryFrame";
 
 import Index from "./pages/Index";
 import Tools from "./pages/Tools";
@@ -36,6 +37,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <GalleryFrame />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/tools" element={<Tools />} />

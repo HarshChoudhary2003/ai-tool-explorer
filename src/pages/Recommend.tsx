@@ -99,15 +99,15 @@ export default function Recommend() {
               <Sparkles className="h-4 w-4 mr-2" />
               AI-Powered Recommendations
             </Badge>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold gradient-text mb-2 sm:mb-4">
-              Find Your Perfect AI Tool
+            <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-normal mb-2 sm:mb-4">
+              Find Your <i className="text-primary">Perfect</i> AI Tool
             </h1>
             <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl mx-auto">
               Describe your task and let our AI analyze 200+ tools to find the best matches for your needs
             </p>
           </motion.div>
 
-          <Card className="glass card-shadow mb-8">
+          <Card className="glass card-shadow mb-8 border-t-primary/60">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Lightbulb className="h-5 w-5 text-primary" />

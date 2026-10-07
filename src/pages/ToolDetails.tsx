@@ -140,11 +140,11 @@ export default function ToolDetails() {
         <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-            <Card className="glass card-shadow">
+            <Card className="glass card-shadow border-t-primary/60">
               <CardHeader className="p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div>
-                    <CardTitle className="text-2xl sm:text-3xl lg:text-4xl mb-3 sm:mb-4">{tool.name}</CardTitle>
+                    <CardTitle className="font-display text-4xl sm:text-5xl lg:text-6xl font-normal mb-3 sm:mb-4">{tool.name}</CardTitle>
                     <div className="flex gap-2 flex-wrap mb-4">
                       <Badge className="bg-primary/20 text-primary border-primary/30">
                         {formatCategory(tool.category)}
