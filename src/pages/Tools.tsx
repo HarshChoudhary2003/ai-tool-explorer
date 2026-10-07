@@ -189,31 +189,19 @@ export default function Tools() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
-      {/* Ambient mesh background */}
-      <div className="absolute inset-0 mesh-bg opacity-60 pointer-events-none" aria-hidden="true" />
-      <div
-        className="absolute -top-40 -right-32 h-[420px] w-[420px] rounded-full bg-primary/20 blur-3xl animate-float pointer-events-none"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-1/3 -left-40 h-[360px] w-[360px] rounded-full bg-accent/20 blur-3xl animate-float pointer-events-none"
-        style={{ animationDelay: "1.5s" }}
-        aria-hidden="true"
-      />
-
       <Header />
 
       <main className="container mx-auto px-4 py-8 sm:py-12 flex-1 relative z-10">
         {/* Hero header */}
         <div className="mb-8 sm:mb-10 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass mb-4 text-xs sm:text-sm">
+          <div className="inline-flex items-center gap-2 border-l-2 border-primary pl-3 py-1 mb-4 text-xs sm:text-sm uppercase">
             <Sparkles className="h-3.5 w-3.5 text-primary animate-pulse-glow" />
             <span className="text-muted-foreground">
               <span className="text-foreground font-semibold">{tools.length}</span> tools and counting
             </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 leading-tight">
-            <span className="shimmer-text">AI Tools Directory</span>
+          <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-normal mb-3 leading-[0.92]">
+            <span>AI Tools <i className="text-primary">Directory</i></span>
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl">
             Explore the most powerful, cutting-edge AI tools across every category — curated, ranked, and updated weekly.
@@ -232,7 +220,7 @@ export default function Tools() {
           </div>
         ) : filteredTools.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-20 animate-fade-in">
-            <div className="h-16 w-16 rounded-2xl glass flex items-center justify-center mb-4">
+            <div className="h-16 w-16 rounded-sm glass flex items-center justify-center mb-4">
               <SearchX className="h-7 w-7 text-muted-foreground" />
             </div>
             <h3 className="text-lg sm:text-xl font-semibold mb-2">No tools match your filters</h3>
@@ -333,7 +321,7 @@ export default function Tools() {
       {/* Floating compare bar */}
       {compareTools.length > 0 && (
         <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[calc(100%-1.5rem)] max-w-3xl px-3 sm:px-0 animate-fade-in">
-          <div className="glass shadow-card rounded-2xl p-3 sm:p-4 flex items-center gap-3 border border-primary/30">
+          <div className="glass shadow-card rounded-sm p-3 sm:p-4 flex items-center gap-3 border border-primary/30">
             <div className="hidden sm:flex h-9 w-9 rounded-xl bg-primary/15 items-center justify-center shrink-0">
               <GitCompare className="h-4 w-4 text-primary" />
             </div>

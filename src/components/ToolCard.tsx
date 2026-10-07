@@ -21,11 +21,11 @@ export function ToolCard({ tool, compareSelected, onToggleCompare, compareDisabl
   };
 
   return (
-    <div className="group relative h-full">
+    <div className="group relative h-full [perspective:1200px]">
       {/* Animated gradient border on hover */}
       <div
         className={cn(
-          "absolute -inset-px rounded-2xl bg-gradient-to-br transition-all duration-500 blur-sm",
+          "absolute -inset-px rounded-sm bg-gradient-to-br transition-all duration-500 blur-sm",
           compareSelected
             ? "from-primary/70 via-secondary/70 to-accent/70 opacity-100"
             : "from-primary/0 via-secondary/0 to-accent/0 opacity-0 group-hover:from-primary/60 group-hover:via-secondary/60 group-hover:to-accent/60 group-hover:opacity-100"
@@ -34,18 +34,20 @@ export function ToolCard({ tool, compareSelected, onToggleCompare, compareDisabl
 
       <div
         className={cn(
-          "relative flex flex-col h-full glass rounded-2xl p-5 sm:p-6 hover-lift overflow-hidden",
+          "gallery-card relative flex flex-col h-full glass rounded-sm p-5 sm:p-6 overflow-hidden",
           compareSelected && "ring-2 ring-primary/60"
         )}
       >
-        {/* Decorative gradient blob */}
-        <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-gradient-primary opacity-10 blur-3xl group-hover:opacity-30 transition-opacity duration-500" />
+        <div className="absolute right-0 top-0 h-px w-2/3 bg-gradient-to-l from-primary/80 to-transparent" />
+        <div className="absolute right-4 top-3 font-display text-5xl text-foreground/5 transition-colors group-hover:text-primary/10" aria-hidden="true">
+          {String(tool.name || "AI").slice(0, 2).toUpperCase()}
+        </div>
 
         {/* Header */}
         <div className="flex items-start justify-between gap-3 relative z-10">
           <div className="flex-1 min-w-0">
             <Link to={`/tools/${tool.id}`} className="block">
-              <h3 className="text-lg sm:text-xl font-bold leading-tight mb-2 group-hover:text-primary transition-colors line-clamp-1">
+              <h3 className="font-display text-2xl sm:text-3xl font-normal leading-tight mb-2 group-hover:text-primary transition-colors line-clamp-1">
                 {tool.name}
               </h3>
             </Link>
@@ -74,7 +76,7 @@ export function ToolCard({ tool, compareSelected, onToggleCompare, compareDisabl
 
         {/* Rating */}
         <div className="flex items-center gap-2 mt-4 relative z-10">
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20">
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded-sm bg-primary/10 border border-primary/20">
             <Star className="h-3.5 w-3.5 text-primary fill-primary" />
             <span className="font-semibold text-sm">{tool.rating}</span>
           </div>

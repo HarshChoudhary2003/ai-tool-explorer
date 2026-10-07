@@ -314,6 +314,12 @@ All colors MUST be HSL.
     isolation: isolate;
   }
 
+  #root .min-h-screen.bg-gradient-secondary,
+  #root .min-h-screen.bg-background {
+    background-color: transparent;
+    background-image: none;
+  }
+
   #root header,
   #root main,
   #root footer,

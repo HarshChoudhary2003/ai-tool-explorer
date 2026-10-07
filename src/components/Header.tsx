@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Menu, User, LogOut, Search } from "lucide-react";
+import { Aperture, Menu, User, LogOut, Search } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -31,29 +31,29 @@ const Header = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-2xl">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              AI Tools Explorer
+          <Link to="/" className="group flex items-center gap-3" aria-label="AI Tools Explorer home">
+            <span className="grid h-8 w-8 place-items-center border border-primary/70 bg-primary/10 transition-transform duration-500 group-hover:rotate-90">
+              <Aperture className="h-4 w-4 text-primary" />
             </span>
+            <span className="font-display text-xl sm:text-2xl text-foreground">AI Tools <i className="text-primary">Explorer</i></span>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-6">
+          <nav className="hidden lg:flex items-center gap-5">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
-                className="text-muted-foreground hover:text-primary transition-colors font-medium"
+                className="text-xs uppercase text-muted-foreground hover:text-primary transition-colors font-semibold"
               >
                 {link.name}
               </Link>
             ))}
             <Link
               to="/#how-it-works"
-              className="text-muted-foreground hover:text-primary transition-colors font-medium"
+              className="text-xs uppercase text-muted-foreground hover:text-primary transition-colors font-semibold"
             >
               How it Works
             </Link>
@@ -65,7 +65,7 @@ const Header = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
+                  <Button variant="ghost" size="icon">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-primary/20 text-primary text-sm">
                         {user.email?.[0]?.toUpperCase() || "U"}
@@ -103,14 +103,14 @@ const Header = () => {
                   <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] glass">
+            <SheetContent side="right" className="w-[300px] glass border-l-primary/30">
               <div className="flex flex-col gap-6 mt-8">
                 {navLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
                     onClick={() => setIsOpen(false)}
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="font-display text-3xl hover:text-primary transition-colors"
                   >
                     {link.name}
                   </Link>
@@ -118,7 +118,7 @@ const Header = () => {
                 <Link
                   to="/#how-it-works"
                   onClick={() => setIsOpen(false)}
-                  className="text-lg font-medium hover:text-primary transition-colors"
+                  className="font-display text-3xl hover:text-primary transition-colors"
                 >
                   How it Works
                 </Link>
