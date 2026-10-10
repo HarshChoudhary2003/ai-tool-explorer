@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Plus, X, ExternalLink, Check, Minus } from "lucide-react";
+import { Loader2, Plus, X, ExternalLink, Check, Minus, GitCompare, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
@@ -90,15 +90,25 @@ export default function Compare() {
             { label: "Compare Tools" },
           ]}
         />
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold gradient-text mb-2 sm:mb-4">Compare AI Tools</h1>
-          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg">
-            Select up to 3 tools to compare their features side-by-side
+
+        {/* Gallery hero header */}
+        <div className="mb-8 sm:mb-10 animate-fade-in">
+          <div className="inline-flex items-center gap-2 border-l-2 border-primary pl-3 py-1 mb-4 text-xs sm:text-sm uppercase">
+            <GitCompare className="h-3.5 w-3.5 text-primary animate-pulse-glow" />
+            <span className="text-muted-foreground">
+              Side-by-side <span className="text-foreground font-semibold">spec sheet</span>
+            </span>
+          </div>
+          <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-normal mb-3 leading-[0.92]">
+            Compare <i className="text-primary">Tools</i>
+          </h1>
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl">
+            Select up to 3 tools to compare their specs, pricing, and API access side-by-side.
           </p>
         </div>
 
         {/* Tool Selection */}
-        <Card className="glass card-shadow mb-6 sm:mb-8">
+        <Card className="glass card-shadow mb-6 sm:mb-8 animate-fade-in" style={{ animationDelay: "0.1s" }}>
           <CardHeader className="pb-4">
             <CardTitle className="text-lg sm:text-xl">Selected Tools ({selectedTools.length}/3)</CardTitle>
           </CardHeader>
@@ -107,9 +117,13 @@ export default function Compare() {
               {[0, 1, 2].map((index) => (
                 <div key={index}>
                   {selectedTools[index] ? (
-                    <div className="glass p-3 sm:p-4 rounded-lg">
-                      <div className="flex items-start justify-between mb-2 gap-2">
-                        <h3 className="font-semibold text-sm sm:text-base truncate">{selectedTools[index].name}</h3>
+                    <div className="glass rounded-sm p-3 sm:p-4 relative overflow-hidden group">
+                      <div className="absolute right-0 top-0 h-px w-2/3 bg-gradient-to-l from-primary/80 to-transparent" />
+                      <div className="absolute right-3 top-2 font-display text-4xl text-foreground/5 group-hover:text-primary/10 transition-colors" aria-hidden="true">
+                        {String(selectedTools[index].name || "AI").slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="flex items-start justify-between mb-2 gap-2 relative z-10">
+                        <h3 className="font-display text-xl sm:text-2xl font-normal truncate">{selectedTools[index].name}</h3>
                         <Button
                           size="icon"
                           variant="ghost"
@@ -119,11 +133,11 @@ export default function Compare() {
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
-                      <Badge className="text-xs">{selectedTools[index].category}</Badge>
+                      <Badge className="text-xs bg-primary/15 text-primary border-primary/30">{selectedTools[index].category}</Badge>
                     </div>
                   ) : (
                     <Select onValueChange={addTool}>
-                      <SelectTrigger className="h-16 sm:h-20 border-dashed border-2">
+                      <SelectTrigger className="h-16 sm:h-20 border-dashed border-2 rounded-sm">
                         <div className="flex items-center gap-2">
                           <Plus className="h-4 w-4" />
                           <SelectValue placeholder="Add tool" />
@@ -150,17 +164,17 @@ export default function Compare() {
         {selectedTools.length >= 2 && (
           <div className="space-y-4 sm:space-y-6">
             {/* Basic Info */}
-            <Card className="glass card-shadow overflow-hidden">
+            <Card className="glass card-shadow overflow-hidden animate-fade-in" style={{ animationDelay: "0.15s" }}>
               {/* Mobile: Stacked Cards */}
               <div className="block md:hidden">
                 <div className="p-4 bg-muted/20 border-b border-border">
-                  <h3 className="font-semibold text-lg">Tool Overview</h3>
+                  <h3 className="font-display text-2xl font-normal">Tool Overview</h3>
                 </div>
                 <div className="divide-y divide-border">
                   {selectedTools.map((tool) => (
                     <div key={tool.id} className="p-4">
                       <Link to={`/tools/${tool.id}`} className="hover:text-primary transition-colors">
-                        <h3 className="font-semibold text-lg mb-2">{tool.name}</h3>
+                        <h3 className="font-display text-2xl font-normal mb-2">{tool.name}</h3>
                       </Link>
                       <Button asChild size="sm" variant="outline">
                         <a href={tool.website_url} target="_blank" rel="noopener noreferrer">
@@ -172,18 +186,23 @@ export default function Compare() {
                   ))}
                 </div>
               </div>
-              
+
               {/* Desktop: Grid Layout */}
               <div className={`hidden md:grid ${getGridCols()} divide-x divide-border`}>
                 <div className="p-4 lg:p-6 bg-muted/20">
-                  <h3 className="font-semibold text-base lg:text-lg">Tool</h3>
+                  <h3 className="font-display text-2xl font-normal">Tool</h3>
                 </div>
                 {selectedTools.map((tool) => (
-                  <div key={tool.id} className="p-4 lg:p-6">
+                  <div key={tool.id} className="p-4 lg:p-6 relative overflow-hidden group">
+                    <div className="absolute right-0 top-0 h-px w-2/3 bg-gradient-to-l from-primary/60 to-transparent" />
                     <Link to={`/tools/${tool.id}`} className="hover:text-primary transition-colors">
-                      <h3 className="font-semibold text-base lg:text-lg mb-2">{tool.name}</h3>
+                      <h3 className="font-display text-2xl lg:text-3xl font-normal mb-2">{tool.name}</h3>
                     </Link>
-                    <Button asChild size="sm" variant="outline" className="mt-2">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+                      <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
+                      <span>{tool.rating ?? "—"}</span>
+                    </div>
+                    <Button asChild size="sm" variant="outline" className="mt-1">
                       <a href={tool.website_url} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-3 w-3 mr-2" />
                         Visit
@@ -195,8 +214,12 @@ export default function Compare() {
             </Card>
 
             {/* Comparison Rows */}
-            {comparisonRows.map((row) => (
-              <Card key={row.key} className="glass card-shadow overflow-hidden">
+            {comparisonRows.map((row, rowIndex) => (
+              <Card
+                key={row.key}
+                className="glass card-shadow overflow-hidden animate-fade-in"
+                style={{ animationDelay: `${0.2 + rowIndex * 0.05}s` }}
+              >
                 {/* Mobile: Stacked Layout */}
                 <div className="block md:hidden">
                   <div className="p-4 bg-muted/20 border-b border-border">
@@ -208,7 +231,7 @@ export default function Compare() {
                       const displayValue = row.format ? row.format(value) : value;
 
                       return (
-                        <div key={tool.id} className="p-4 flex items-center justify-between">
+                        <div key={tool.id} className="p-4 flex items-center justify-between gap-3">
                           <span className="text-sm text-muted-foreground">{tool.name}</span>
                           {typeof value === "boolean" ? (
                             value ? (
@@ -217,7 +240,7 @@ export default function Compare() {
                               <Minus className="h-5 w-5 text-muted-foreground" />
                             )
                           ) : (
-                            <span className={`text-sm ${!displayValue || displayValue === "null" ? "text-muted-foreground" : ""}`}>
+                            <span className={`text-sm text-right ${!displayValue || displayValue === "null" ? "text-muted-foreground" : ""}`}>
                               {displayValue || "N/A"}
                             </span>
                           )}
@@ -226,11 +249,11 @@ export default function Compare() {
                     })}
                   </div>
                 </div>
-                
+
                 {/* Desktop: Grid Layout */}
                 <div className={`hidden md:grid ${getGridCols()} divide-x divide-border`}>
                   <div className="p-4 lg:p-6 bg-muted/20 flex items-center">
-                    <h4 className="font-semibold text-sm lg:text-base">{row.label}</h4>
+                    <h4 className="font-semibold text-sm lg:text-base uppercase tracking-wide">{row.label}</h4>
                   </div>
                   {selectedTools.map((tool: any) => {
                     const value = tool[row.key];
@@ -257,7 +280,7 @@ export default function Compare() {
             ))}
 
             {/* Tasks/Capabilities */}
-            <Card className="glass card-shadow overflow-hidden">
+            <Card className="glass card-shadow overflow-hidden animate-fade-in" style={{ animationDelay: "0.55s" }}>
               {/* Mobile: Stacked Layout */}
               <div className="block md:hidden">
                 <div className="p-4 bg-muted/20 border-b border-border">
@@ -278,11 +301,11 @@ export default function Compare() {
                   ))}
                 </div>
               </div>
-              
+
               {/* Desktop: Grid Layout */}
               <div className={`hidden md:grid ${getGridCols()} divide-x divide-border`}>
                 <div className="p-4 lg:p-6 bg-muted/20">
-                  <h4 className="font-semibold text-sm lg:text-base">Capabilities</h4>
+                  <h4 className="font-semibold text-sm lg:text-base uppercase tracking-wide">Capabilities</h4>
                 </div>
                 {selectedTools.map((tool) => (
                   <div key={tool.id} className="p-4 lg:p-6">
@@ -299,10 +322,10 @@ export default function Compare() {
             </Card>
 
             {/* Pros & Cons */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 animate-fade-in" style={{ animationDelay: "0.6s" }}>
               <Card className="glass card-shadow">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-primary text-lg sm:text-xl">Pros</CardTitle>
+                  <CardTitle className="text-primary text-lg sm:text-xl font-display font-normal">Pros</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -325,7 +348,7 @@ export default function Compare() {
 
               <Card className="glass card-shadow">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-destructive text-lg sm:text-xl">Cons</CardTitle>
+                  <CardTitle className="text-destructive text-lg sm:text-xl font-display font-normal">Cons</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -350,8 +373,10 @@ export default function Compare() {
         )}
 
         {selectedTools.length < 2 && (
-          <Card className="glass card-shadow">
+          <Card className="glass card-shadow animate-fade-in" style={{ animationDelay: "0.15s" }}>
             <CardContent className="py-12 sm:py-16 text-center">
+              <GitCompare className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <p className="font-display text-2xl sm:text-3xl mb-2">Pick your contenders</p>
               <p className="text-muted-foreground text-base sm:text-lg">
                 Select at least 2 tools to start comparing
               </p>

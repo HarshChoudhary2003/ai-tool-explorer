@@ -126,15 +126,18 @@ export default function Blog() {
 
       <main className="flex-1 container mx-auto px-4 py-8 sm:py-12">
         {/* Header */}
-        <div className="text-center mb-10">
-          <Badge className="mb-4 glass border-primary/30 text-primary">
-            Latest Updates
-          </Badge>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold gradient-text mb-4">
-            Blog & Insights
+        <div className="mb-10 animate-fade-in">
+          <div className="inline-flex items-center gap-2 border-l-2 border-primary pl-3 py-1 mb-4 text-xs sm:text-sm uppercase">
+            <Star className="h-3.5 w-3.5 text-primary animate-pulse-glow" />
+            <span className="text-muted-foreground">
+              Latest <span className="text-foreground font-semibold">updates</span>
+            </span>
+          </div>
+          <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-normal mb-3 leading-[0.92]">
+            Blog & <i className="text-primary">Insights</i>
           </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Stay updated with the latest news, tutorials, and insights about AI tools
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl">
+            Stay updated with the latest news, tutorials, and insights about AI tools.
           </p>
         </div>
 
@@ -175,7 +178,7 @@ export default function Blog() {
                     >
                       <Card className="glass card-shadow hover:scale-[1.02] transition-all group h-full">
                         {post.cover_image && (
-                          <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
+                          <div className="aspect-video bg-muted rounded-t-sm overflow-hidden">
                             <img
                               src={post.cover_image}
                               alt={post.title}
@@ -241,7 +244,7 @@ export default function Blog() {
                     >
                       <Card className="glass card-shadow hover:scale-105 transition-all group h-full">
                         {post.cover_image && (
-                          <div className="aspect-video bg-muted rounded-t-lg overflow-hidden">
+                          <div className="aspect-video bg-muted rounded-t-sm overflow-hidden">
                             <img
                               src={post.cover_image}
                               alt={post.title}

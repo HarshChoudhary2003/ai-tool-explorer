@@ -179,17 +179,19 @@ export default function Trending() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8 sm:mb-12"
+          className="mb-8 sm:mb-12"
         >
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium mb-3 sm:mb-4">
-            <Flame className="h-3 w-3 sm:h-4 sm:w-4" />
-            Trending Now
+          <div className="inline-flex items-center gap-2 border-l-2 border-primary pl-3 py-1 mb-4 text-xs sm:text-sm uppercase">
+            <Flame className="h-3.5 w-3.5 text-primary animate-pulse-glow" />
+            <span className="text-muted-foreground">
+              Community <span className="text-foreground font-semibold">engagement</span> rankings
+            </span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4">
-            Discover What's <span className="text-primary">Hot</span>
+          <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl font-normal mb-3 leading-[0.92]">
+            What's <i className="text-primary">Hot</i>
           </h1>
-          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl mx-auto px-4">
-            See the most popular AI tools based on views, bookmarks, and ratings from our community.
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl">
+            The most popular AI tools right now, ranked by views, bookmarks, and ratings from our community.
           </p>
         </motion.div>
 
@@ -256,7 +258,7 @@ export default function Trending() {
                         <Card className="glass hover:border-primary/50 transition-all">
                           <CardContent className="p-3 sm:p-4">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                              <Badge className={`${getRankBadge(index)} text-base sm:text-lg font-bold w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full flex-shrink-0 self-start sm:self-center`}>
+                              <Badge className={`${getRankBadge(index)} text-base sm:text-lg font-bold w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-sm flex-shrink-0 self-start sm:self-center`}>
                                 {index + 1}
                               </Badge>
                               <div className="flex-1 min-w-0">
