@@ -188,6 +188,58 @@ export default function Admin() {
     }
   };
 
+  // ---------- Reviews moderation ----------
+  const toolNameById = (id: string) => tools.find((t) => t.id === id)?.name || "Unknown tool";
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm("Delete this review? This cannot be undone.")) return;
+    const { error } = await supabase.from("tool_ratings").delete().eq("id", id);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Deleted", description: "Review removed" });
+      setReviews((prev) => prev.filter((r) => r.id !== id));
+    }
+  };
+
+  // ---------- Tool submissions ----------
+  const pendingSubmissions = submissions.filter((s) => s.status === "pending");
+
+  const handleSubmission = async (submission: any, status: "approved" | "rejected") => {
+    if (status === "approved") {
+      const category = CATEGORIES.includes(submission.category) ? submission.category : "productivity";
+      const pricing = PRICING_TYPES.includes(submission.pricing) ? submission.pricing : "freemium";
+      const { error: insertError } = await supabase.from("ai_tools").insert([{
+        name: submission.name,
+        website_url: submission.website_url,
+        description: submission.description,
+        category: category as any,
+        pricing: pricing as any,
+      }]);
+      if (insertError) {
+        toast({ title: "Error", description: insertError.message, variant: "destructive" });
+        return;
+      }
+    }
+
+    const { error } = await supabase
+      .from("tool_submissions")
+      .update({ status, reviewed_at: new Date().toISOString(), reviewed_by: user?.id })
+      .eq("id", submission.id);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({
+        title: status === "approved" ? "Approved" : "Rejected",
+        description: status === "approved"
+          ? `"${submission.name}" is now live in the directory`
+          : `"${submission.name}" was marked as rejected`,
+      });
+      fetchData();
+    }
+  };
+
   // ---------- Dataset validation ----------
   const validation = validateDataset(tools);
 
