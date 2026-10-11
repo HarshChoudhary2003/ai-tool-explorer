@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Pencil, Trash2, Shield, Users, Wrench, Mail, FileText, MessageSquare, AlertTriangle, CheckCircle2, Upload, FileJson, Download } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Shield, Users, Wrench, Mail, FileText, MessageSquare, AlertTriangle, CheckCircle2, Upload, FileJson, Download, Star, Inbox, Check, X, ExternalLink } from "lucide-react";
 import { validateDataset, parseCSV, normalizeToolRow, type ToolIssue } from "@/lib/datasetValidation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -38,6 +38,8 @@ export default function Admin() {
   const [contacts, setContacts] = useState<any[]>([]);
   const [subscribers, setSubscribers] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [submissions, setSubmissions] = useState<any[]>([]);
   const [editingTool, setEditingTool] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [importText, setImportText] = useState("");
@@ -77,17 +79,21 @@ export default function Admin() {
   const fetchData = async () => {
     setLoading(true);
     
-    const [toolsRes, contactsRes, subscribersRes, profilesRes] = await Promise.all([
+    const [toolsRes, contactsRes, subscribersRes, profilesRes, reviewsRes, submissionsRes] = await Promise.all([
       supabase.from("ai_tools").select("*").order("created_at", { ascending: false }),
       supabase.from("contacts").select("id, name, subject, created_at").order("created_at", { ascending: false }).limit(50),
       supabase.from("newsletter_subscribers").select("id, subscribed_at, is_active").order("subscribed_at", { ascending: false }).limit(50),
       supabase.from("profiles").select("id, user_id, display_name, avatar_url, created_at").order("created_at", { ascending: false }).limit(50),
+      supabase.from("tool_ratings").select("id, tool_id, user_id, rating, review, helpful_count, created_at").order("created_at", { ascending: false }).limit(100),
+      supabase.from("tool_submissions").select("*").order("created_at", { ascending: false }),
     ]);
 
     if (toolsRes.data) setTools(toolsRes.data);
     if (contactsRes.data) setContacts(contactsRes.data);
     if (subscribersRes.data) setSubscribers(subscribersRes.data);
     if (profilesRes.data) setUsers(profilesRes.data);
+    if (reviewsRes.data) setReviews(reviewsRes.data);
+    if (submissionsRes.data) setSubmissions(submissionsRes.data);
     
     setLoading(false);
   };
