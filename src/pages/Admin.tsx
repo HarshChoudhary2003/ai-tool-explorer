@@ -595,6 +595,145 @@ export default function Admin() {
             </Card>
           </TabsContent>
 
+          {/* Submissions Tab */}
+          <TabsContent value="submissions">
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Inbox className="h-5 w-5 text-primary" />
+                  Tool Submissions
+                </CardTitle>
+                <CardDescription>
+                  Review tools submitted by users. Approving adds the tool to the public directory.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {submissions.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No submissions yet</p>
+                ) : (
+                  <div className="space-y-4">
+                    {submissions.map((sub) => (
+                      <Card key={sub.id} className="p-4">
+                        <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-display text-xl">{sub.name}</p>
+                              <Badge
+                                variant={sub.status === "pending" ? "outline" : sub.status === "approved" ? "default" : "destructive"}
+                                className="capitalize"
+                              >
+                                {sub.status}
+                              </Badge>
+                            </div>
+                            <a
+                              href={sub.website_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-primary hover:underline inline-flex items-center gap-1 mt-1"
+                            >
+                              {sub.website_url}
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </div>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(sub.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{sub.description}</p>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          <Badge variant="secondary" className="capitalize">{sub.category?.replace(/_/g, " ")}</Badge>
+                          <Badge variant="secondary" className="capitalize">{sub.pricing}</Badge>
+                          {sub.submitter_name && (
+                            <Badge variant="outline">by {sub.submitter_name}</Badge>
+                          )}
+                        </div>
+                        {sub.additional_info && (
+                          <p className="text-xs text-muted-foreground italic mb-3 border-l-2 border-border pl-3">
+                            {sub.additional_info}
+                          </p>
+                        )}
+                        {sub.status === "pending" && (
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={() => handleSubmission(sub, "approved")}>
+                              <Check className="h-4 w-4 mr-1" /> Approve & Publish
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => handleSubmission(sub, "rejected")}>
+                              <X className="h-4 w-4 mr-1" /> Reject
+                            </Button>
+                          </div>
+                        )}
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Reviews Tab */}
+          <TabsContent value="reviews">
+            <Card className="glass">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-yellow-500" />
+                  User Reviews
+                </CardTitle>
+                <CardDescription>
+                  Ratings and reviews submitted by users. Shown on each tool's details page.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {reviews.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No reviews yet</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Tool</TableHead>
+                          <TableHead>Rating</TableHead>
+                          <TableHead>Review</TableHead>
+                          <TableHead>Helpful</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {reviews.map((review) => (
+                          <TableRow key={review.id}>
+                            <TableCell className="font-medium whitespace-nowrap">
+                              {toolNameById(review.tool_id)}
+                            </TableCell>
+                            <TableCell>
+                              <span className="inline-flex items-center gap-1">
+                                <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
+                                {review.rating}
+                              </span>
+                            </TableCell>
+                            <TableCell className="max-w-[320px]">
+                              <span className="line-clamp-2 text-sm text-muted-foreground">
+                                {review.review || "—"}
+                              </span>
+                            </TableCell>
+                            <TableCell>{review.helpful_count ?? 0}</TableCell>
+                            <TableCell className="whitespace-nowrap">
+                              {new Date(review.created_at).toLocaleDateString()}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="icon" onClick={() => handleDeleteReview(review.id)}>
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           {/* Validation Tab */}
           <TabsContent value="validation">
             <Card className="glass">
