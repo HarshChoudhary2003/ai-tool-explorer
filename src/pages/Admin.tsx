@@ -428,8 +428,17 @@ export default function Admin() {
         </div>
 
         <Tabs defaultValue="tools" className="space-y-6">
-          <TabsList className="glass">
+          <TabsList className="glass flex-wrap h-auto">
             <TabsTrigger value="tools">AI Tools</TabsTrigger>
+            <TabsTrigger value="submissions">
+              Submissions
+              {pendingSubmissions.length > 0 && (
+                <span className="ml-2 px-1.5 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">
+                  {pendingSubmissions.length}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="reviews">Reviews</TabsTrigger>
             <TabsTrigger value="validation">
               Validation
               {validation.issueCount > 0 && (
