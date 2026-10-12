@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { TrendingUp, Flame, Star, Bookmark, Eye, ArrowUp, Loader2, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
+import { TiltCard } from "@/components/TiltCard";
 
 interface TrendingTool {
   tool_id: string;
@@ -255,10 +256,11 @@ export default function Trending() {
                       transition={{ delay: index * 0.05 }}
                     >
                       {item.tool && (
-                        <Card className="glass hover:border-primary/50 transition-all">
+                        <TiltCard maxTilt={3} scale={1.01}>
+                        <Card className="glass hover:border-primary/50 transition-all [transform-style:preserve-3d] hover:shadow-[0_20px_45px_-15px_hsl(var(--primary)/0.3)]">
                           <CardContent className="p-3 sm:p-4">
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-                              <Badge className={`${getRankBadge(index)} text-base sm:text-lg font-bold w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-sm flex-shrink-0 self-start sm:self-center`}>
+                              <Badge className={`${getRankBadge(index)} text-base sm:text-lg font-bold w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-sm flex-shrink-0 self-start sm:self-center [transform:translateZ(35px)] shadow-lg`}>
                                 {index + 1}
                               </Badge>
                               <div className="flex-1 min-w-0">
@@ -314,6 +316,7 @@ export default function Trending() {
                             </div>
                           </CardContent>
                         </Card>
+                        </TiltCard>
                       )}
                     </motion.div>
                   ))}
@@ -337,8 +340,10 @@ export default function Trending() {
               <CardContent>
                 {mostBookmarked.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {mostBookmarked.map((tool) => (
-                      <ToolCard key={tool.id} tool={tool} />
+                     {mostBookmarked.map((tool) => (
+                      <TiltCard key={tool.id} maxTilt={4} scale={1.01}>
+                        <ToolCard tool={tool} />
+                      </TiltCard>
                     ))}
                   </div>
                 ) : (
@@ -365,7 +370,9 @@ export default function Trending() {
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {topRated.map((tool) => (
-                    <ToolCard key={tool.id} tool={tool} />
+                    <TiltCard key={tool.id} maxTilt={4} scale={1.01}>
+                      <ToolCard tool={tool} />
+                    </TiltCard>
                   ))}
                 </div>
               </CardContent>
@@ -387,8 +394,10 @@ export default function Trending() {
               <CardContent>
                 {risingStars.length > 0 ? (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {risingStars.map((tool) => (
-                      <ToolCard key={tool.id} tool={tool} />
+                     {risingStars.map((tool) => (
+                      <TiltCard key={tool.id} maxTilt={4} scale={1.01}>
+                        <ToolCard tool={tool} />
+                      </TiltCard>
                     ))}
                   </div>
                 ) : (
