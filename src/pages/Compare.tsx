@@ -133,7 +133,9 @@ export default function Compare() {
                           <X className="h-4 w-4" />
                         </Button>
                       </div>
-                      <Badge className="text-xs bg-primary/15 text-primary border-primary/30">{selectedTools[index].category}</Badge>
+                      <Badge className="text-xs bg-primary/15 text-primary border-primary/30">
+                        {selectedTools[index].category.split("_").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+                      </Badge>
                     </div>
                   ) : (
                     <Select onValueChange={addTool}>

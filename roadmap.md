@@ -6,4 +6,4 @@
 - [x] Recompose homepage and directory for immersive 3D presentation
 - [x] Extend the visual system across every route without changing behavior (Compare, Trending, Blog, Admin done)
 - [x] Admin: reviews moderation + tool submissions approval system
-- [ ] Verify desktop, mobile, reduced-motion, and core user flows (directory, filters, compare)
+- [x] Verify desktop, mobile, reduced-motion, and core user flows (directory, filters, compare)
