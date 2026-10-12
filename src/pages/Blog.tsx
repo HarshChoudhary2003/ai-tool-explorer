@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowRight, Loader2, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { TiltCard } from "@/components/TiltCard";
 
 interface BlogPost {
   id: string;
@@ -176,9 +177,10 @@ export default function Blog() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
                     >
-                      <Card className="glass card-shadow hover:scale-[1.02] transition-all group h-full">
+                      <TiltCard maxTilt={7} scale={1.015}>
+                      <Card className="glass card-shadow transition-all group h-full [transform-style:preserve-3d] hover:border-primary/40 hover:shadow-[0_30px_60px_-15px_hsl(var(--primary)/0.3)]">
                         {post.cover_image && (
-                          <div className="aspect-video bg-muted rounded-t-sm overflow-hidden">
+                          <div className="aspect-video bg-muted rounded-t-sm overflow-hidden [transform:translateZ(45px)]">
                             <img
                               src={post.cover_image}
                               alt={post.title}
@@ -187,7 +189,7 @@ export default function Blog() {
                             />
                           </div>
                         )}
-                        <CardHeader>
+                        <CardHeader className="[transform:translateZ(30px)]">
                           <div className="flex items-center gap-2 mb-2">
                             {post.category && (
                               <Badge variant="secondary">{post.category}</Badge>
@@ -218,6 +220,7 @@ export default function Blog() {
                           </Link>
                         </CardContent>
                       </Card>
+                      </TiltCard>
                     </motion.div>
                   ))}
                 </div>
@@ -242,9 +245,10 @@ export default function Blog() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card className="glass card-shadow hover:scale-105 transition-all group h-full">
+                      <TiltCard maxTilt={6} scale={1.03}>
+                      <Card className="glass card-shadow transition-all group h-full [transform-style:preserve-3d] hover:border-primary/40 hover:shadow-[0_30px_60px_-15px_hsl(var(--primary)/0.3)]">
                         {post.cover_image && (
-                          <div className="aspect-video bg-muted rounded-t-sm overflow-hidden">
+                          <div className="aspect-video bg-muted rounded-t-sm overflow-hidden [transform:translateZ(45px)]">
                             <img
                               src={post.cover_image}
                               alt={post.title}
@@ -253,7 +257,7 @@ export default function Blog() {
                             />
                           </div>
                         )}
-                        <CardHeader>
+                        <CardHeader className="[transform:translateZ(30px)]">
                           {post.category && (
                             <Badge variant="secondary" className="w-fit mb-2">
                               {post.category}
@@ -280,6 +284,7 @@ export default function Blog() {
                           </Link>
                         </CardContent>
                       </Card>
+                      </TiltCard>
                     </motion.div>
                   ))}
                 </div>
